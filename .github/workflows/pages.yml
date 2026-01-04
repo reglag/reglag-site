@@ -46,7 +46,7 @@ jobs:
           HOUR=$(date -u "+%H")
           if [ "$HOUR" = "22" ]; then echo "RUN_TYPE=later" >> $GITHUB_ENV; else echo "RUN_TYPE=morning" >> $GITHUB_ENV; fi
 
-   
+      - name: Build site
         run: |
           echo "Running RegLag build with RUN_TYPE=$RUN_TYPE"
           if [ "$RUN_TYPE" = "morning" ]; then export BACKFILL_DAYS=90; fi
