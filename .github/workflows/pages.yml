@@ -31,8 +31,11 @@ jobs:
         with:
           python-version: "3.11"
 
+
       - name: Install dependencies
         run: |
+                unzip -o regulatory_site_package.zip -d .
+
           python -m pip install --upgrade pip
           if [ -f regulatory_site/requirements.txt ]; then pip install -r regulatory_site/requirements.txt; fi
 
