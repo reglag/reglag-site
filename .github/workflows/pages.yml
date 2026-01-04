@@ -31,11 +31,12 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Extract regulatory_site package
+        run: |
+          unzip -o regulatory_site_package.zip -d .
 
       - name: Install dependencies
         run: |
-                unzip -o regulatory_site_package.zip -d .
-
           python -m pip install --upgrade pip
           if [ -f regulatory_site/requirements.txt ]; then pip install -r regulatory_site/requirements.txt; fi
 
@@ -43,9 +44,9 @@ jobs:
         id: runtype
         run: |
           HOUR=$(date -u "+%H")
-          if [ "$HOUR" = "22" ]; then echo "RUN_TYPE=late" >> $GITHUB_ENV; else echo "RUN_TYPE=morning" >> $GITHUB_ENV; fi
+          if [ "$HOUR" = "22" ]; then echo "RUN_TYPE=later" >> $GITHUB_ENV; else echo "RUN_TYPE=morning" >> $GITHUB_ENV; fi
 
-      - name: Build site
+   
         run: |
           echo "Running RegLag build with RUN_TYPE=$RUN_TYPE"
           if [ "$RUN_TYPE" = "morning" ]; then export BACKFILL_DAYS=90; fi
