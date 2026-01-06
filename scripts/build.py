@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-import re
 from datetime import datetime, timezone
 from email.utils import format_datetime
 from xml.sax.saxutils import escape as xml_escape
@@ -18,10 +17,66 @@ OUT = ROOT / "publish" / "site"
 ARCHIVE = OUT / "briefings"
 ABOUT_SRC = ROOT / "about" / "index.md"
 
-# Update this if your canonical URL changes.
+# Canonical URL for RSS links.
 SITE_URL = "https://reglag.com"
 
-DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}\.md$")
+def md_to_html(text: str) -> str:
+    if markdown is None:
+        esc = (
+            text.replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+        )
+        paras = "".join(f"<p>{p.strip()}</p>" for p in esc.split("\n\n") if p.strip())
+        return paras
+    return markdown.markdown(text, extensions=["fenced_code", "tables"])
+
+def extract_title(md_text: str) -> str:
+    for line in md_text.splitlines():
+        if line.startswith("# "):
+            return line[2:].strip()
+    return "RegLag Daily Briefing"
+
+def format_spelled_date(dt: datetime) -> str:
+    # Cross-platform “January 6, 2026” (no leading zero).
+    return dt.strftime("%B %d, %Y").replace(" 0", " ")
+
+def build_rss(items: list[tuple[str, str]], *, site_url: str) -> str:
+    """
+    items: list of (date_str 'YYYY-MM-DD', title) in reverse chronological order
+    """
+    channel_title = "RegLag — Daily Regulatory Briefing"
+    channel_link = site_url + "/"
+    channel_desc = "Daily regulatory briefing. Informational only."
+
+    now = format_datetime(datetime.now(timezone.utc))
+    lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+        "  <channel>",
+        f"    <title>{xml_escape(channel_title)}</title>",
+        f"    <link>{xml_escape(channel_link)}</link>",
+        f"    <description>{xml_escape(channel_desc)}</description>",
+        f"    <lastBuildDate>{now}</lastBuildDate>",
+        f'    <atom:link href="{xml_escape(site_url + "/rss.xml")}" rel="self" type="application/rss+xml" />',
+    ]
+
+    for date_str, title in items:
+        dt = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        pub = format_datetime(dt)
+        url = f"{site_url}/briefings/{date_str}.html"
+        rss_title = title or f"RegLag Daily Briefing — {format_spelled_date(dt)}"
+        lines += [
+            "    <item>",
+            f"      <title>{xml_escape(rss_title)}</title>",
+            f"      <link>{xml_escape(url)}</link>",
+            f"      <guid isPermaLink=\"true\">{xml_escape(url)}</guid>",
+            f"      <pubDate>{pub}</pubDate>",
+            "    </item>",
+        ]
+
+    lines += ["  </channel>", "</rss>"]
+    return "\n".join(lines) + "\n"
 
 HTML = """<!doctype html>
 <html lang="en">
@@ -84,6 +139,24 @@ HTML = """<!doctype html>
       margin: 16px 0 28px;
     }}
 
+    /* Top navigation under masthead */
+    .top-nav {{
+      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: -8px 0 24px;
+    }}
+
+    .top-nav a {{
+      color: inherit;
+      text-decoration: none;
+    }}
+
+    .top-nav a:hover {{
+      text-decoration: underline;
+      color: var(--link-hover);
+    }}
+
     h1 {{
       font-size: 26px;
       line-height: 1.25;
@@ -123,12 +196,6 @@ HTML = """<!doctype html>
       color: var(--link-hover);
     }}
 
-    .meta {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 13px;
-      color: var(--text-secondary);
-    }}
-
     .site-footer {{
       margin-top: 48px;
     }}
@@ -158,6 +225,13 @@ HTML = """<!doctype html>
       <div class="masthead-title">REGLAG</div>
       <div class="masthead-subtitle">Daily Regulatory Briefing</div>
       <hr />
+      <nav class="top-nav">
+        <a href="/">Latest</a> ·
+        <a href="/briefings/index.html">Archive</a> ·
+        <a href="/about/index.html">About</a> ·
+        <a href="/rss.xml">RSS</a> ·
+        <a href="mailto:contact@reglag.com">Contact</a>
+      </nav>
     </header>
 
     <main>
@@ -169,7 +243,9 @@ HTML = """<!doctype html>
       <nav class="footer-nav">
         <a href="/">Latest</a> ·
         <a href="/briefings/index.html">Archive</a> ·
-        <a href="/about/index.html">About</a>
+        <a href="/about/index.html">About</a> ·
+        <a href="/rss.xml">RSS</a> ·
+        <a href="mailto:contact@reglag.com">Contact</a>
       </nav>
       <div class="footer-disclaimer">
         Informational only. Not legal, financial, or compliance advice.
@@ -180,66 +256,12 @@ HTML = """<!doctype html>
 </html>
 """
 
-def md_to_html(text: str) -> str:
-    if markdown is None:
-        esc = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-        paras = "".join(f"<p>{p.strip()}</p>" for p in esc.split("\n\n") if p.strip())
-        return paras
-    return markdown.markdown(text, extensions=["fenced_code", "tables"])
-
-def extract_title(md_text: str) -> str:
-    for line in md_text.splitlines():
-        if line.startswith("# "):
-            return line[2:].strip()
-    return "RegLag Daily Briefing"
-
-def format_spelled_date(dt: datetime) -> str:
-    # Cross-platform “January 6, 2026” (no leading zero)
-    return dt.strftime("%B %d, %Y").replace(" 0", " ")
-
-def build_rss(items: list[tuple[str, str]], *, site_url: str) -> str:
-    """
-    items: list of (date_str 'YYYY-MM-DD', title)
-    """
-    channel_title = "RegLag — Daily Regulatory Briefing"
-    channel_link = site_url + "/"
-    channel_desc = "Daily regulatory briefing. Informational only."
-
-    now = format_datetime(datetime.now(timezone.utc))
-    lines = [
-        '<?xml version="1.0" encoding="UTF-8"?>',
-        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
-        "  <channel>",
-        f"    <title>{xml_escape(channel_title)}</title>",
-        f"    <link>{xml_escape(channel_link)}</link>",
-        f"    <description>{xml_escape(channel_desc)}</description>",
-        f"    <lastBuildDate>{now}</lastBuildDate>",
-        f'    <atom:link href="{xml_escape(site_url + "/rss.xml")}" rel="self" type="application/rss+xml" />',
-    ]
-
-    for date_str, title in items:
-        dt = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-        pub = format_datetime(dt)
-        url = f"{site_url}/briefings/{date_str}.html"
-        # Keep titles short-ish in RSS; your H1 is already date-based.
-        rss_title = title or f"RegLag Daily Briefing — {format_spelled_date(dt)}"
-        lines += [
-            "    <item>",
-            f"      <title>{xml_escape(rss_title)}</title>",
-            f"      <link>{xml_escape(url)}</link>",
-            f"      <guid isPermaLink=\"true\">{xml_escape(url)}</guid>",
-            f"      <pubDate>{pub}</pubDate>",
-            "    </item>",
-        ]
-
-    lines += ["  </channel>", "</rss>"]
-    return "\n".join(lines) + "\n"
-
 def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     ARCHIVE.mkdir(parents=True, exist_ok=True)
 
-    md_files = sorted([p for p in SRC.glob("*.md") if DATE_RE.match(p.name)], reverse=True)
+    md_files = sorted([p for p in SRC.glob("*.md") if p.name[:10].count("-") == 2], reverse=True)
+    md_files = [p for p in md_files if len(p.stem) == 10]  # YYYY-MM-DD
     if not md_files:
         print("No briefings found in ./briefings")
         return 0
@@ -263,18 +285,23 @@ def main() -> int:
         encoding="utf-8",
     )
 
-    # Archive index (date + title, grouped by month)
+    # Archive index (clickable)
     archive_html = "<h1>Briefing Archive</h1>"
     current_month = None
+
     for date_str, title in archive_items:
         dt = datetime.strptime(date_str, "%Y-%m-%d")
         month_label = dt.strftime("%B %Y")
+
         if month_label != current_month:
             archive_html += f"<h2>{month_label}</h2>"
             current_month = month_label
+
         archive_html += (
-            f"<p><strong>{format_spelled_date(dt)}</strong><br />"
-            f"<em>{title}</em></p>"
+            f'<p><a href="/briefings/{date_str}.html">'
+            f"<strong>{format_spelled_date(dt)}</strong><br />"
+            f"<em>{title}</em>"
+            "</a></p>"
         )
 
     (ARCHIVE / "index.html").write_text(
@@ -295,8 +322,6 @@ def main() -> int:
     # RSS feed (latest first)
     rss = build_rss(archive_items[:50], site_url=SITE_URL)
     (OUT / "rss.xml").write_text(rss, encoding="utf-8")
-
-    # Convenience alias (some readers look for /feed.xml)
     (OUT / "feed.xml").write_text(rss, encoding="utf-8")
 
     print(f"Built {len(md_files)} briefings. Latest: {latest}")
