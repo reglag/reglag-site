@@ -55,7 +55,7 @@ def build_rss(items: list[tuple[str, str]], *, site_url: str) -> str:
         '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
         "  <channel>",
         f"    <title>{xml_escape(channel_title)}</title>",
-        f"    <link>{xml_escape(channel_link)}</link>",
+        f"    <link>{xml_escape(site_url)}</link>",
         f"    <description>{xml_escape(channel_desc)}</description>",
         f"    <lastBuildDate>{now}</lastBuildDate>",
         f'    <atom:link href="{xml_escape(site_url + "/rss.xml")}" rel="self" type="application/rss+xml" />',
