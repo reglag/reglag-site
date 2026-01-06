@@ -46,8 +46,7 @@ def build_rss(items: list[tuple[str, str]], *, site_url: str) -> str:
     items: list of (date_str 'YYYY-MM-DD', title) in reverse chronological order
     """
     channel_title = "RegLag — Daily Financial Regulatory Briefing"
-    channel_link = site_url + "/"
-    channel_desc = "A daily financial regulatory briefing providing neutral, source-based insights. Informational only."
+  channel_desc = "RegLag is a daily briefing providing fast, source-based analysis of financial regulatory and policy developments, with forward-looking context."
 
     now = format_datetime(datetime.now(timezone.utc))
     lines = [
@@ -117,6 +116,13 @@ HTML = """<!doctype html>
       margin: 0 auto;
       padding: 28px 18px 64px;
     }}
+
+    .masthead-description {
+        font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 2px;
+    }
 
     .masthead-title {{
       font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
@@ -224,6 +230,7 @@ HTML = """<!doctype html>
     <header>
       <div class="masthead-title">REGLAG</div>
       <div class="masthead-subtitle">Daily Financial Regulatory Briefing</div>
+              <div class="masthead-description">RegLag is a daily briefing providing fast, source-based analysis of financial regulatory and policy developments, with forward-looking context.</div>
       <hr />
       <nav class="top-nav">
         <a href="/">Latest</a> ·
