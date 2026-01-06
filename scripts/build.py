@@ -122,7 +122,8 @@ HTML = """<!doctype html>
         font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
         font-size: 12px;
         color: var(--text-secondary);
-        margin-top: 2px;
+        margin-top: 4px;
+        font-style: italic;
     }}
 
     .masthead-title {{
