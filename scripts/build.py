@@ -118,7 +118,7 @@ HTML = """<!doctype html>
       padding: 28px 18px 64px;
     }}
 
-    .masthead-description{ {
+    .masthead-description {{
         font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
         font-size: 12px;
         color: var(--text-secondary);
