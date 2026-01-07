@@ -4,6 +4,12 @@ RegLag is a daily regulatory briefing designed for fast, credible situational aw
 
 Each edition summarizes notable developments across financial regulation, market structure, and adjacent policy areas that may affect financial institutions, markets, and regulated activity. The focus is on clarity, discipline, and source-based analysis.
 
+
+
+The name RegLag reflects a simple reality: regulatory decisions, disclosures, and enforcement actions often affect markets and institutions with a delay. RegLag focuses on understanding that gap—between policy action and real-world impact.
+
+RegLag is an independent publication and is not affiliated with, sponsored by, or acting on behalf of any financial institution, regulator, or market participant.
+
 RegLag is written to be read quickly, with structured interpretation and forward-looking context, but without advocacy or recommendations.
 
 ## What RegLag is not
