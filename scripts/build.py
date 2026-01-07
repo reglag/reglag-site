@@ -240,8 +240,7 @@ HTML = """<!doctype html>
   <div class="wrap">
     <header>
       <div class="masthead-title">
-        <a href="/">REGLAG</a>
-      </div>
+                <a href="/">REGLAG</a>
       <div class="masthead-subtitle">Daily Financial Regulatory Briefing</div>
               <div class="masthead-description">RegLag is a daily briefing providing fast, source-based analysis of financial regulatory and policy developments, with forward-looking context.</div>
       <hr />
