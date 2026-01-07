@@ -134,14 +134,14 @@ HTML = """<!doctype html>
       color: var(--accent);
     }}
 
-    .masthead-title a {
+  .  .masthead-title a {{
       color: inhereit;
       text-decoration: none;
-    }
+ }}
 
-    .masthead-title a:hover {
+    .masthead-title a:hover {{
       text-decoration: none;
-    }
+    }}
 
     .masthead-subtitle {{
       font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
@@ -240,7 +240,7 @@ HTML = """<!doctype html>
   <div class="wrap">
     <header>
       <div class="masthead-title">
-                <a href="/">REGLAG</a>
+                <a href="/">EGLAG</a>
       <div class="masthead-subtitle">Daily Financial Regulatory Briefing</div>
               <div class="masthead-description">RegLag is a daily briefing providing fast, source-based analysis of financial regulatory and policy developments, with forward-looking context.</div>
       <hr />
