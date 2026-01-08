@@ -5,6 +5,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 from email.utils import format_datetime
 from xml.sax.saxutils import escape as xml_escape
+import re
 
 try:
     import markdown  # pip install markdown
@@ -41,9 +42,34 @@ def format_spelled_date(dt: datetime) -> str:
     # Cross-platform “January 6, 2026” (no leading zero).
     return dt.strftime("%B %d, %Y").replace(" 0", " ")
 
-def build_rss(items: list[tuple[str, str]], *, site_url: str) -> str:
+
+# --- Post type detection (source of truth = first H2) ------------------------
+POST_TYPE_ALIASES: dict[str, str] = {
+    "daily briefing": "Daily Briefing",
+    "weekend deep dive": "Weekend Deep Dive",
+    "deep dive": "Weekend Deep Dive",
+    "weekend edition": "Weekend Deep Dive",
+}
+
+H2_RE = re.compile(r"^\s*##\s+(.+?)\s*$", re.MULTILINE)
+
+def extract_first_h2(md_text: str) -> str | None:
+    m = H2_RE.search(md_text)
+    return m.group(1).strip() if m else None
+
+def normalize_post_type(h2: str | None) -> str | None:
+    if not h2:
+        return None
+    key = h2.strip().lower()
+    return POST_TYPE_ALIASES.get(key)
+
+def infer_post_type_from_date(dt: datetime) -> str:
+    # Saturday (5) / Sunday (6) -> Weekend Deep Dive
+    return "Weekend Deep Dive" if dt.weekday() >= 5 else "Daily Briefing"
+
+def build_rss(items: list[tuple[str, str, str]], *, site_url: str) -> str:
     """
-    items: list of (date_str 'YYYY-MM-DD', title) in reverse chronological order
+    items: list of (date_str 'YYYY-MM-DD', post_type, title) in reverse chronological order
     """
     channel_title = "RegLag — Daily Financial Regulatory Briefing"
     channel_desc = "RegLag is a daily briefing providing fast, source-based analysis of financial regulatory and policy developments, with weekend deep dives into enforecement, market structure, and regulatory mechanisms."
@@ -61,11 +87,11 @@ def build_rss(items: list[tuple[str, str]], *, site_url: str) -> str:
         f'    <atom:link href="{xml_escape(site_url + "/rss.xml")}" rel="self" type="application/rss+xml" />',
     ]
 
-    for date_str, title in items:
+    for date_str, post_type, title in items:
         dt = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
         pub = format_datetime(dt)
         url = f"{site_url}/briefings/{date_str}.html"
-        rss_title = title or f"RegLag Daily Briefing — {format_spelled_date(dt)}"
+        rss_title = f"{post_type} — {title}"
         lines += [
             "    <item>",
             f"      <title>{xml_escape(rss_title)}</title>",
@@ -289,17 +315,21 @@ def main() -> int:
         print("No briefings found in ./briefings")
         return 0
 
-    archive_items: list[tuple[str, str]] = []
+    archive_items: list[tuple[str, str, str]] = []  # (date_str, post_type, title)
 
     # Build briefing pages
     for p in md_files:
         md_text = p.read_text(encoding="utf-8")
         title = extract_title(md_text)
+        dt = datetime.strptime(p.stem, "%Y-%m-%d")
+        h2 = extract_first_h2(md_text)
+        post_type = normalize_post_type(h2) or infer_post_type_from_date(dt)
+
         body = md_to_html(md_text)
         html = HTML.format(title=title, body=body)
         out_path = ARCHIVE / f"{p.stem}.html"
         out_path.write_text(html, encoding="utf-8")
-        archive_items.append((p.stem, title))
+        archive_items.append((p.stem, post_type, title))
 
     # Latest as homepage
     latest = md_files[0].stem
@@ -312,7 +342,7 @@ def main() -> int:
     archive_html = "<h1>Briefing Archive</h1>"
     current_month = None
 
-    for date_str, title in archive_items:
+    for date_str, post_type, title in archive_items:
         dt = datetime.strptime(date_str, "%Y-%m-%d")
         month_label = dt.strftime("%B %Y")
 
@@ -320,11 +350,9 @@ def main() -> int:
             archive_html += f"<h2>{month_label}</h2>"
             current_month = month_label
 
+        display = f"{format_spelled_date(dt)} — {post_type} — {title}"
         archive_html += (
-            f'<p><a href="/briefings/{date_str}.html">'
-            f"<strong>{format_spelled_date(dt)}</strong><br />"
-            f"<em>{title}</em>"
-            "</a></p>"
+            f'<p><a href="/briefings/{date_str}.html">{xml_escape(display)}</a></p>'
         )
 
     (ARCHIVE / "index.html").write_text(
