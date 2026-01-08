@@ -1,10 +1,10 @@
 # About RegLag
 
-RegLag is a daily regulatory briefing designed for fast, credible situational awareness.
+RegLag is a daily financial regulatory briefing.
 
 Each edition summarizes notable developments across financial regulation, market structure, and adjacent policy areas that may affect financial institutions, markets, and regulated activity. The focus is on clarity, discipline, and source-based analysis.
 
-
+RegLag publishes a daily financial regulatory briefing during the week and longer-form weekend deep dives that examine specific enforcement regimes, market structure mechanisms, and regulatory transmission channels. Daily briefings focus on situational awareness. Weekend deep dives focus on explanation, pattern detection, and forward-looking questions.
 
 The name RegLag reflects a simple reality: regulatory decisions, disclosures, and enforcement actions often affect markets and institutions with a delay. RegLag focuses on understanding that gap—between policy action and real-world impact.
 
