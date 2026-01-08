@@ -87,6 +87,9 @@ HTML = """<!doctype html>
 
   <!-- RSS -->
   <link rel="alternate" type="application/rss+xml" title="RegLag RSS" href="/rss.xml" />
+  
+  <!-- 100% privacy-first analytics -->
+  <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
 
   <style>
     :root {{
