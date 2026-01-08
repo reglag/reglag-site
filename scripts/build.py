@@ -317,7 +317,7 @@ HTML = """<!doctype html>
         <a href="/">REGLAG</a>
       </div>
       <div class="masthead-subtitle">Daily Financial Regulatory Briefing</div>
-      <div class="masthead-description">RegLag is a daily briefing providing fast, source-based insights of financial regulatory and policy developments.</div>
+      <div class="masthead-description">RegLag is a daily briefing providing fast, source-based insights of financial regulatory and policy developments on weekdays, with weekend deep dives into enforcement, market structure, and regulatory mechanisms.</div>
       <hr />
       <nav class="top-nav">
         <a href="/">Latest</a> ·
