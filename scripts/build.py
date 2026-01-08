@@ -46,7 +46,7 @@ def build_rss(items: list[tuple[str, str]], *, site_url: str) -> str:
     items: list of (date_str 'YYYY-MM-DD', title) in reverse chronological order
     """
     channel_title = "RegLag — Daily Financial Regulatory Briefing"
-    channel_desc = "RegLag is a daily briefing providing fast, source-based analysis of financial regulatory and policy developments, with forward-looking context."
+    channel_desc = "RegLag is a daily briefing providing fast, source-based analysis of financial regulatory and policy developments, with weekend deep dives into enforecement, market structure, and regulatory mechanisms."
     
 
     now = format_datetime(datetime.now(timezone.utc))
@@ -246,7 +246,7 @@ HTML = """<!doctype html>
             <a href="/">REGLAG</a>
                         </div>
             <div class="masthead-subtitle">Daily Financial Regulatory Briefing</div>
-              <div class="masthead-description">RegLag is a daily briefing providing fast, source-based analysis of financial regulatory and policy developments, with forward-looking context.</div>
+              <div class="masthead-description">RegLag is a daily briefing providing fast, source-based analysis of financial regulatory and policy developments, with weekend deep dives into enforecement, market structure, and regulatory mechanisms.</div>
       <hr />
       <nav class="top-nav">
         <a href="/">Latest</a> ·
