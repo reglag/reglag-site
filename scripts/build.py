@@ -192,6 +192,7 @@ HTML = """<!doctype html>
     }}
 
     .masthead-subtitle {{
+      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
       margin-top: 8px;
       font-size: 22px;
       line-height: 1.25;
