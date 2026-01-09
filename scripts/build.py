@@ -22,7 +22,6 @@ PORTFOLIO_SRC = ROOT / "portfolio" / "index.md"
 # Canonical URL for RSS links.
 SITE_URL = "https://reglag.com"
 
-
 # -----------------------------
 # Markdown helpers
 # -----------------------------
@@ -123,7 +122,6 @@ def build_rss(items: list[tuple[str, str, str]], *, site_url: str) -> str:
         pub = format_datetime(dt)
         url = f"{site_url}/briefings/{date_str}.html"
 
-        # RSS title includes post type prefix:
         rss_title = f"{post_type} — {title}"
 
         lines += [
@@ -181,39 +179,28 @@ HTML = """<!doctype html>
     .wrap {{
       max-width: 820px;
       margin: 0 auto;
-      padding: 28px 18px 64px;
+      padding: 28px 22px 60px;
     }}
 
     .masthead-title {{
       font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      font-size: 13px;
       color: var(--accent);
-    }}
-
-    .masthead-title a {{
-      color: inherit;
-      text-decoration: none;
-    }}
-
-    .masthead-title a:hover {{
-      text-decoration: none;
+      text-transform: uppercase;
     }}
 
     .masthead-subtitle {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 2px;
+      margin-top: 8px;
+      font-size: 22px;
+      line-height: 1.25;
+      font-weight: 700;
     }}
 
     .masthead-description {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 12px;
+      margin-top: 10px;
       color: var(--text-secondary);
-      margin-top: 4px;
-      font-style: italic;
     }}
 
     hr {{
@@ -323,7 +310,7 @@ HTML = """<!doctype html>
       <nav class="top-nav">
         <a href="/">Latest</a> ·
         <a href="/briefings/index.html">Archive</a> ·
-          <a href="/portfolio/index.html">Portfolio</a> ·
+        <a href="/portfolio/index.html">Portfolio</a> ·
         <a href="/about/index.html">About</a> ·
         <a href="/rss.xml">RSS</a> ·
         <a href="mailto:contact@reglag.com">Contact</a>
@@ -339,10 +326,9 @@ HTML = """<!doctype html>
       <nav class="footer-nav">
         <a href="/">Latest</a> ·
         <a href="/briefings/index.html">Archive</a> ·
-          <a href="/portfolio/index.html">Portfolio</a> ·
+        <a href="/portfolio/index.html">Portfolio</a> ·
         <a href="/about/index.html">About</a> ·
         <a href="/rss.xml">RSS</a> ·
-          
         <a href="mailto:contact@reglag.com">Contact</a>
       </nav>
       <div class="footer-disclaimer">
@@ -435,16 +421,18 @@ def main() -> int:
         (about_out / "index.html").write_text(
             HTML.format(title="About", body=about_html),
             encoding="utf-8",
-  
-        # Portfolio page
-if PORTFOLIO_SRC.exists():
-    portfolio_html = md_to_html(PORTFOLIO_SRC.read_text(encoding="utf-8"))
-    portfolio_out = OUT / "portfolio"
-    portfolio_out.mkdir(parents=True, exist_ok=True)
-    (portfolio_out / "index.html").write_text(
-        HTML.format(title="RegLag Model Portfolio", body=portfolio_html),
-        encoding="utf-8",
-)
+        )
+
+    # Portfolio page
+    if PORTFOLIO_SRC.exists():
+        portfolio_html = md_to_html(PORTFOLIO_SRC.read_text(encoding="utf-8"))
+        portfolio_out = OUT / "portfolio"
+        portfolio_out.mkdir(parents=True, exist_ok=True)
+        (portfolio_out / "index.html").write_text(
+            HTML.format(title="RegLag Model Portfolio", body=portfolio_html),
+            encoding="utf-8",
+        )
+
     # RSS feed (latest first, with post_type prefix)
     rss = build_rss(archive_items[:50], site_url=SITE_URL)
     (OUT / "rss.xml").write_text(rss, encoding="utf-8")
