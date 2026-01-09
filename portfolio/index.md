@@ -33,7 +33,8 @@ The portfolio may remain unchanged for extended periods when no adjustment is wa
 
 The portfolio is reviewed daily, but changes are made only when underlying conditions change in a way that materially affects the original rationale for a position.
 
-Adjustments are driven by:  
+Adjustments are driven by:
+
 - shifts in market structure or liquidity  
 - regulatory or policy developments  
 - changes in relative risk, not short-term price movement
