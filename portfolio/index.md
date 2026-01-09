@@ -58,12 +58,6 @@ The full portfolio detail is maintained here to avoid overloading the daily brie
 
 ### Portfolio
 
-Include the full “26 for 2026” table with:
-- holdings
-- weights
-- entry price
-- last price
-- performance
-- per-position rationale (parentheticals italicized)
+Coming soon...
 
 *Not investment advice.*
