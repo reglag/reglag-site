@@ -1,4 +1,4 @@
-# RegLag Model Portfolio (26 for 2026)
+# RegLag Model Portfolio  
 
 ## Overview
 
