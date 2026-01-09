@@ -444,9 +444,7 @@ if PORTFOLIO_SRC.exists():
     (portfolio_out / "index.html").write_text(
         HTML.format(title="RegLag Model Portfolio", body=portfolio_html),
         encoding="utf-8",
-    )
 )
-
     # RSS feed (latest first, with post_type prefix)
     rss = build_rss(archive_items[:50], site_url=SITE_URL)
     (OUT / "rss.xml").write_text(rss, encoding="utf-8")
