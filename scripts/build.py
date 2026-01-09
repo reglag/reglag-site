@@ -412,7 +412,7 @@ def main() -> int:
         month_label = dt.strftime("%B %Y")
 
         if month_label != current_month:
-            archive_html += f"<h2>{month_label}</h2>"
+            archive_html += f"<h3>{month_label}</h3>"
             current_month = month_label
 
         display = f"{format_spelled_date(dt)} — {post_type} — {title}"
