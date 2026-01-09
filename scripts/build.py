@@ -154,6 +154,7 @@ HTML = """<!doctype html>
   <link rel="alternate" type="application/rss+xml" title="RegLag RSS" href="/rss.xml" />
 
   <!-- Icons -->
+  <link rel="icon" href="/favicon.ico" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
@@ -394,6 +395,12 @@ def main() -> int:
         if ASSETS_OUT.exists():
             shutil.rmtree(ASSETS_OUT)
         shutil.copytree(ASSETS_SRC, ASSETS_OUT)
+
+    # Copy root favicon for Safari compatibility
+    root_favicon_src = ASSETS_SRC / "icons" / "favicon.ico"
+    root_favicon_out = OUT / "favicon.ico"
+    if root_favicon_src.exists():
+        shutil.copyfile(root_favicon_src, root_favicon_out)
     
     md_files = sorted(
         [p for p in SRC.glob("*.md") if re.match(r"^\d{4}-\d{2}-\d{2}\.md$", p.name)],
