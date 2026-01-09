@@ -17,6 +17,7 @@ SRC = ROOT / "briefings"
 OUT = ROOT / "publish" / "site"
 ARCHIVE = OUT / "briefings"
 ABOUT_SRC = ROOT / "about" / "index.md"
+PORTFOLIO_SRC = ROOT / "portfolio" / "index.md"
 
 # Canonical URL for RSS links.
 SITE_URL = "https://reglag.com"
@@ -322,6 +323,7 @@ HTML = """<!doctype html>
       <nav class="top-nav">
         <a href="/">Latest</a> ·
         <a href="/briefings/index.html">Archive</a> ·
+          <a href="/portfolio/index.html">Portfolio</a> ·
         <a href="/about/index.html">About</a> ·
         <a href="/rss.xml">RSS</a> ·
         <a href="mailto:contact@reglag.com">Contact</a>
@@ -337,8 +339,10 @@ HTML = """<!doctype html>
       <nav class="footer-nav">
         <a href="/">Latest</a> ·
         <a href="/briefings/index.html">Archive</a> ·
+          <a href="/portfolio/index.html">Portfolio</a> ·
         <a href="/about/index.html">About</a> ·
         <a href="/rss.xml">RSS</a> ·
+          
         <a href="mailto:contact@reglag.com">Contact</a>
       </nav>
       <div class="footer-disclaimer">
@@ -431,7 +435,17 @@ def main() -> int:
         (about_out / "index.html").write_text(
             HTML.format(title="About", body=about_html),
             encoding="utf-8",
-        )
+  
+        # Portfolio page
+if PORTFOLIO_SRC.exists():
+    portfolio_html = md_to_html(PORTFOLIO_SRC.read_text(encoding="utf-8"))
+    portfolio_out = OUT / "portfolio"
+    portfolio_out.mkdir(parents=True, exist_ok=True)
+    (portfolio_out / "index.html").write_text(
+        HTML.format(title="RegLag Model Portfolio", body=portfolio_html),
+        encoding="utf-8",
+    )
+)
 
     # RSS feed (latest first, with post_type prefix)
     rss = build_rss(archive_items[:50], site_url=SITE_URL)
