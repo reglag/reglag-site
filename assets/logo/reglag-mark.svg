@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Left face -->
+  <polygon points="128,64 128,384 256,448 256,128" fill="#000000"/>
+  <!-- Right face -->
+  <polygon points="256,128 256,448 384,384 384,64" fill="#000000"/>
+  <!-- Letter R cutout -->
+  <rect x="160" y="160" width="32" height="256" fill="#FFFFFF"/>
+  <rect x="160" y="160" width="64" height="32" fill="#FFFFFF"/>
+  <rect x="160" y="288" width="64" height="32" fill="#FFFFFF"/>
+  <polygon points="224,320 256,416 224,416" fill="#FFFFFF"/>
+  <!-- Letter L cutout -->
+  <rect x="352" y="160" width="32" height="256" fill="#FFFFFF"/>
+  <rect x="320" y="416" width="64" height="32" fill="#FFFFFF"/>
+</svg>
