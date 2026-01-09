@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from email.utils import format_datetime
 from xml.sax.saxutils import escape as xml_escape
 import re
+import shutil
 
 try:
     import markdown  # pip install markdown
@@ -18,6 +19,8 @@ OUT = ROOT / "publish" / "site"
 ARCHIVE = OUT / "briefings"
 ABOUT_SRC = ROOT / "about" / "index.md"
 PORTFOLIO_SRC = ROOT / "portfolio" / "index.md"
+ASSETS_SRC = ROOT / "assets"
+ASSETS_OUT = OUT / "assets"
 
 # Canonical URL for RSS links.
 SITE_URL = "https://reglag.com"
@@ -386,6 +389,12 @@ def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     ARCHIVE.mkdir(parents=True, exist_ok=True)
 
+    # Copy static assets (logo + icons) into the published site root.
+    if ASSETS_SRC.exists():
+        if ASSETS_OUT.exists():
+            shutil.rmtree(ASSETS_OUT)
+        shutil.copytree(ASSETS_SRC, ASSETS_OUT)
+    
     md_files = sorted(
         [p for p in SRC.glob("*.md") if re.match(r"^\d{4}-\d{2}-\d{2}\.md$", p.name)],
         reverse=True,
