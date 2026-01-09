@@ -184,24 +184,34 @@ HTML = """<!doctype html>
 
     .masthead-title {{
       font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      font-size: 13px;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      font-weight: 600;
       color: var(--accent);
-      text-transform: uppercase;
+    }}
+
+    .masthead-title a {{
+      color: inherit;
+      text-decoration: none;
+    }}
+
+    .masthead-title a:hover {{
+      text-decoration: none;
     }}
 
     .masthead-subtitle {{
       font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      margin-top: 8px;
-      font-size: 22px;
-      line-height: 1.25;
-      font-weight: 700;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
     }}
 
     .masthead-description {{
-      margin-top: 10px;
+      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+      font-size: 12px;
       color: var(--text-secondary);
+      margin-top: 4px;
+      font-style: italic;
     }}
 
     hr {{
