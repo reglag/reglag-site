@@ -150,6 +150,11 @@ HTML = """<!doctype html>
   <!-- RSS -->
   <link rel="alternate" type="application/rss+xml" title="RegLag RSS" href="/rss.xml" />
 
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
+
   <!-- 100% privacy-first analytics -->
   <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
 
@@ -197,6 +202,18 @@ HTML = """<!doctype html>
 
     .masthead-title a:hover {{
       text-decoration: none;
+    }}
+
+    .masthead-title .brand {{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }}
+
+    .brand-mark {{
+      display: block;
+      width: 28px;
+      height: 28px;
     }}
 
     .masthead-subtitle {{
@@ -313,7 +330,17 @@ HTML = """<!doctype html>
   <div class="wrap">
     <header>
       <div class="masthead-title">
-        <a href="/">REGLAG</a>
+        <a class="brand" href="/">
+          <img
+            src="/assets/logo/reglag-mark-128.png"
+            alt="RegLag"
+            class="brand-mark"
+            width="28"
+            height="28"
+            decoding="async"
+          />
+          <span>REGLAG</span>
+        </a>
       </div>
       <div class="masthead-subtitle">Daily Financial Regulatory Briefing</div>
       <div class="masthead-description">RegLag is a daily briefing providing fast, source-based insights of financial regulatory and policy developments on weekdays, with weekend deep dives into enforcement, market structure, and regulatory mechanisms.</div>
