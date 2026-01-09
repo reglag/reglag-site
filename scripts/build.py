@@ -415,9 +415,10 @@ def main() -> int:
             archive_html += f"<h3>{month_label}</h3>"
             current_month = month_label
 
-        display = f"{format_spelled_date(dt)} — {post_type} — {title}"
+        prefix = f"{format_spelled_date(dt)} — {post_type} — "
+        display_html = f'{xml_escape(prefix)}<em>{xml_escape(title)}</em>'
         url = f"/briefings/{date_str}.html"
-        archive_html += f'<p><a href="{url}">{xml_escape(display)}</a></p>'
+        archive_html += f'<p><a href="{url}">{display_html}</a></p>'
 
     (ARCHIVE / "index.html").write_text(
         HTML.format(title="Briefing Archive", body=archive_html),
