@@ -336,7 +336,7 @@ HTML = """<!doctype html>
       <div class="masthead-title">
         <a class="brand" href="/">
           <img
-            src="/assets/logo/reglag-mark-128.png"
+            src="/assets/logo/reglag-mark-128-tight.png"
             alt="RegLag"
             class="brand-mark"
             width="28"
