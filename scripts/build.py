@@ -437,6 +437,22 @@ def main() -> int:
         out_path = ARCHIVE / f"{p.stem}.html"
         out_path.write_text(html, encoding="utf-8")
 
+        # --- Chart of the Day assets (daily briefings only) ---
+        day_dir = SRC / p.stem  # e.g. briefings/2026-01-10/
+        if day_dir.exists() and day_dir.is_dir():
+            chart_png = day_dir / "chart.png"
+            chart_json = day_dir / "chart.json"
+
+            # If a chart is present, require metadata and copy the whole folder to output
+            if chart_png.exists():
+                if not chart_json.exists():
+                    raise SystemExit(f"Missing chart.json for {p.stem} (found chart.png)")
+
+                out_day_dir = ARCHIVE / p.stem  # dist/briefings/2026-01-10/
+                if out_day_dir.exists():
+                    shutil.rmtree(out_day_dir)
+                shutil.copytree(day_dir, out_day_dir)
+
         archive_items.append((p.stem, post_type, title))
 
     # Latest as homepage
