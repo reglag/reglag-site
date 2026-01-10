@@ -8,7 +8,18 @@ The portfolio is not a recommendation, signal service, or allocation guide. It e
 
 ---
 
-### How the portfolio is constructed
+### Portfolio snapshot
+
+Marks are as of January 9, 2026.
+
+- **Weighted return since inception:** ≈ +0.52%
+- **Inception date:** January 6, 2026
+- **Inception value:** $100.00
+- **Current value:** ≈ $100.52
+
+---
+
+### Portfolio construction
 
 The portfolio is governed by a small number of structural constraints:
 
@@ -49,6 +60,12 @@ Marks are intended to provide directional context rather than execution-level pr
 
 ---
 
+### Income, distributions, and cash treatment
+
+Dividends and distributions are treated as portfolio cash flows and are reflected in total portfolio value when received. Such income may temporarily result in unallocated cash within the portfolio. No assumption is made regarding reinvestment timing, pricing, execution, or the maintenance of a target cash allocation unless explicitly noted.
+
+---
+
 ### Relationship to RegLag briefings
 
 Daily briefings may reference the model portfolio in narrative form, including whether changes occurred and the high-level rationale.
@@ -57,14 +74,7 @@ The full portfolio detail is maintained here to avoid overloading the daily brie
 
 ---
 
-### Portfolio
-
-Marks are as of January 9, 2026.
-
-- **Weighted return since inception:** ≈ +0.52%
-- **Inception date:** January 6, 2026
-- **Inception value:** $100.00
-- **Current value:** ≈ $100.52
+### Current holdings
 
 **Ticker (Portfolio Weight)**
 
