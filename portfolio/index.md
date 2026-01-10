@@ -59,12 +59,12 @@ The full portfolio detail is maintained here to avoid overloading the daily brie
 
 ### Portfolio
 
-Marks are as of January 8, 2026.
+Marks are as of January 9, 2026.
 
-- **Weighted return since inception:** ≈ +0.01%
+- **Weighted return since inception:** ≈ +0.52%
 - **Inception date:** January 6, 2026
 - **Inception value:** $100.00
-- **Current value:** ≈ $100.01
+- **Current value:** ≈ $100.52
 
 **Ticker (Portfolio Weight)**
 
