@@ -379,6 +379,7 @@ HTML = """<!doctype html>
         <a href="/portfolio/index.html">Portfolio</a> ·
         <a href="/about/index.html">About</a> ·
         <a href="/rss.xml">RSS</a> ·
+        <a href="https://x.com/reglag_hq" rel="me noopener" target="_blank">X</a> ·
         <a href="mailto:contact@reglag.com">Contact</a>
       </nav>
       <div class="footer-disclaimer">
