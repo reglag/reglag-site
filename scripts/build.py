@@ -150,6 +150,14 @@ HTML = """<!doctype html>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RegLag — Daily Financial Regulatory Briefing — {title}</title>
 
+  <!-- Canonical -->
+  <link rel="canonical" href="{canonical_url}" />
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="RegLag" />
+  <meta property="og:title" content="RegLag — {title}" />
+  <meta property="og:url" content="{canonical_url}" />
+
   <!-- RSS -->
   <link rel="alternate" type="application/rss+xml" title="RegLag RSS" href="/rss.xml" />
 
@@ -433,7 +441,8 @@ def main() -> int:
         body_html = md_to_html(md_body)
         body_html = insert_post_type_after_h1(body_html, post_type)
 
-        html = HTML.format(title=title, body=body_html)
+        canonical_url = f"{SITE_URL}/briefings/{p.stem}.html"
+        html = HTML.format(title=title, body=body_html, canonical_url=canonical_url)
         out_path = ARCHIVE / f"{p.stem}.html"
         out_path.write_text(html, encoding="utf-8")
 
@@ -455,12 +464,30 @@ def main() -> int:
 
         archive_items.append((p.stem, post_type, title))
 
-    # Latest as homepage
-    latest = md_files[0].stem
-    (OUT / "index.html").write_text(
-        (ARCHIVE / f"{latest}.html").read_text(encoding="utf-8"),
-        encoding="utf-8",
+    # Latest as homepage (canonical is site root)
+    latest_file = md_files[0]
+    latest = latest_file.stem
+    latest_md = latest_file.read_text(encoding="utf-8")
+    latest_title = extract_title(latest_md)
+
+    dt = datetime.strptime(latest, "%Y-%m-%d")
+    raw_h2 = extract_first_h2(latest_md)
+    normalized = normalize_post_type(raw_h2)
+    if normalized:
+        post_type = normalized
+        md_body = H2_RE.sub("", latest_md, count=1).lstrip()
+    else:
+        post_type = infer_post_type_from_date(dt)
+        md_body = latest_md
+
+    home_body_html = md_to_html(md_body)
+    home_body_html = insert_post_type_after_h1(home_body_html, post_type)
+    home_html = HTML.format(
+        title=latest_title,
+        body=home_body_html,
+        canonical_url=f"{SITE_URL}/",
     )
+    (OUT / "index.html").write_text(home_html, encoding="utf-8")
 
     # Archive index (clickable + labeled)
     archive_html = "<h1>Briefing Archive</h1>"
@@ -480,7 +507,7 @@ def main() -> int:
         archive_html += f'<p><a href="{url}">{display_html}</a></p>'
 
     (ARCHIVE / "index.html").write_text(
-        HTML.format(title="Briefing Archive", body=archive_html),
+        HTML.format(title="Briefing Archive", body=archive_html, canonical_url=f"{SITE_URL}/briefings/"),
         encoding="utf-8",
     )
 
@@ -490,7 +517,7 @@ def main() -> int:
         about_out = OUT / "about"
         about_out.mkdir(parents=True, exist_ok=True)
         (about_out / "index.html").write_text(
-            HTML.format(title="About", body=about_html),
+            HTML.format(title="About", body=about_html, canonical_url=f"{SITE_URL}/about/"),
             encoding="utf-8",
         )
 
@@ -500,7 +527,7 @@ def main() -> int:
         portfolio_out = OUT / "portfolio"
         portfolio_out.mkdir(parents=True, exist_ok=True)
         (portfolio_out / "index.html").write_text(
-            HTML.format(title="RegLag Model Portfolio", body=portfolio_html),
+            HTML.format(title="RegLag Model Portfolio", body=portfolio_html, canonical_url=f"{SITE_URL}/portfolio/"),
             encoding="utf-8",
         )
 
