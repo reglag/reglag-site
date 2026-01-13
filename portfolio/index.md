@@ -62,7 +62,7 @@ Marks are intended to provide directional context rather than execution-level pr
 
 ### Income, distributions, and cash treatment
 
-Dividends and distributions are treated as portfolio cash flows and are reflected in total portfolio value when received. Such income may temporarily result in unallocated cash within the portfolio. No assumption is made regarding reinvestment timing, pricing, execution, or the maintenance of a target cash allocation unless explicitly noted.
+Dividends, interest, and fund distributions are recognized on a quarterly lookback basis rather than daily. At the end of each calendar quarter, all distributions received during the period are aggregated and recorded as portfolio cash flows, which are reflected in total portfolio value when received. Such income may temporarily result in unallocated cash within the portfolio. No assumption is made regarding reinvestment timing, pricing, execution, or the maintenance of a target cash allocation unless explicitly noted.
 
 ---
 
