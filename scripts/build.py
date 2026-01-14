@@ -142,31 +142,17 @@ def build_rss(items: list[tuple[str, str, str]], *, site_url: str) -> str:
 
 
 
-def build_sitemap(
-    *,
-    site_url: str,
-    archive_items: list[tuple[str, str, str]],
-    include_about: bool,
-    include_portfolio: bool,
-) -> str:
-    """Deterministic sitemap.xml for RegLag.
+def build_sitemap_from_output(*, site_url: str, out_dir: Path, include_about: bool, include_portfolio: bool) -> str:
+    """Deterministic sitemap.xml generated from actual output HTML files.
 
-    Includes:
-      - Homepage
-      - Briefings archive index
-      - Each briefing HTML page
-      - About + Portfolio pages (if present)
+    Enumerates:
+      - /
+      - /briefings/
+      - /briefings/YYYY-MM-DD.html (from output directory)
+      - /about/ and /portfolio/ if present
 
-    Notes:
-      - This is a pure transport/structure artifact (no editorial influence).
-      - Uses build date for static pages; uses briefing date for briefing pages.
+    This avoids any coupling to archive metadata and guarantees one URL per <loc>.
     """
-
-    def abs_url(path: str) -> str:
-        if not path.startswith("/"):
-            path = "/" + path
-        return urljoin(site_url.rstrip("/") + "/", path.lstrip("/"))
-
     build_date = datetime.now(timezone.utc).date().isoformat()
 
     lines: list[str] = [
@@ -174,51 +160,31 @@ def build_sitemap(
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     ]
 
-    # Homepage
-    lines += [
-        "  <url>",
-        f"    <loc>{xml_escape(abs_url('/'))}</loc>",
-        f"    <lastmod>{build_date}</lastmod>",
-        "  </url>",
-    ]
+    def add(loc: str, lastmod: str) -> None:
+        lines.append("  <url>")
+        lines.append(f"    <loc>{xml_escape(loc)}</loc>")
+        lines.append(f"    <lastmod>{xml_escape(lastmod)}</lastmod>")
+        lines.append("  </url>")
 
-    # Archive index
-    lines += [
-        "  <url>",
-        f"    <loc>{xml_escape(abs_url('/briefings/'))}</loc>",
-        f"    <lastmod>{build_date}</lastmod>",
-        "  </url>",
-    ]
+    # Homepage + archive index
+    add(f"{site_url}/", build_date)
+    add(f"{site_url}/briefings/", build_date)
+
+    # Briefings (from output files)
+    briefings_dir = out_dir / "briefings"
+    if briefings_dir.exists():
+        for p in sorted(briefings_dir.glob('*.html')):
+            date_str = p.stem  # YYYY-MM-DD
+            add(f"{site_url}/briefings/{p.name}", date_str)
 
     # Optional pages
     if include_about:
-        lines += [
-            "  <url>",
-            f"    <loc>{xml_escape(abs_url('/about/'))}</loc>",
-            f"    <lastmod>{build_date}</lastmod>",
-            "  </url>",
-        ]
+        add(f"{site_url}/about/", build_date)
     if include_portfolio:
-        lines += [
-            "  <url>",
-            f"    <loc>{xml_escape(abs_url('/portfolio/'))}</loc>",
-            f"    <lastmod>{build_date}</lastmod>",
-            "  </url>",
-        ]
-
-    # Briefings: lastmod = briefing date (already YYYY-MM-DD)
-    for date_str, _post_type, _title in archive_items:
-        lines += [
-            "  <url>",
-            f"    <loc>{xml_escape(abs_url(f'/briefings/{date_str}.html'))}</loc>",
-            f"    <lastmod>{xml_escape(date_str)}</lastmod>",
-            "  </url>",
-        ]
+        add(f"{site_url}/portfolio/", build_date)
 
     lines.append("</urlset>")
     return "\n".join(lines) + "\n"
-
-
 
 # -----------------------------
 # HTML template
@@ -620,7 +586,7 @@ def main() -> int:
     sitemap = build_sitemap_from_output(
         site_url=SITE_URL,
         out_dir=OUT,
-        include_about=ABOUT_SRC.exists(),
+                include_about=ABOUT_SRC.exists(),
         include_portfolio=PORTFOLIO_SRC.exists(),
     )
     (OUT / "sitemap.xml").write_text(sitemap, encoding="utf-8")
