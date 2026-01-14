@@ -617,9 +617,9 @@ def main() -> int:
     (OUT / "feed.xml").write_text(rss, encoding="utf-8")
 
     # Sitemap (root-level)
-    sitemap = build_sitemap(
+    sitemap = build_sitemap_from_output(
         site_url=SITE_URL,
-        archive_items=archive_items,
+        out_dir=OUT,
         include_about=ABOUT_SRC.exists(),
         include_portfolio=PORTFOLIO_SRC.exists(),
     )
