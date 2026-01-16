@@ -209,7 +209,7 @@ def build_rss(items: list[tuple[str, str, str]], *, site_url: str) -> str:
     """
     channel_title = "RegLag — Daily Financial Regulatory Briefing"
     channel_desc = (
-        "A daily financial regulatory briefing providing neutral, source-based insights. "
+        "RegLag is a financial regulatory briefing focused on source-based interpretation of regulatory, policy, and market-structure developments, with weekday coverage and weekend deep dives into enforcement and regulatory mechanisms."
         "Informational only."
     )
 
@@ -489,7 +489,7 @@ HTML = """<!doctype html>
         </a>
       </div>
       <div class="masthead-subtitle">Daily Financial Regulatory Briefing</div>
-      <div class="masthead-description">RegLag is a daily briefing providing fast, source-based insights of financial regulatory and policy developments on weekdays, with weekend deep dives into enforcement, market structure, and regulatory mechanisms.</div>
+      <div class="masthead-description">RegLag is a financial regulatory briefing focused on source-based interpretation of regulatory, policy, and market-structure developments, with weekday coverage and weekend deep dives into enforcement and regulatory mechanisms.</div>
       <hr />
       <nav class="top-nav">
         <a href="/">Latest</a> ·
