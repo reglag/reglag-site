@@ -154,6 +154,17 @@ HTML = """<!doctype html>
   <!-- Canonical -->
   <link rel="canonical" href="{canonical_url}" />
 
+  <!-- Structured data (Organization) -->
+  <script type="application/ld+json">
+  {{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "RegLag",
+    "url": "https://reglag.com",
+    "logo": "https://reglag.com/assets/logo/reglag-mark-128-tight.png"
+  }}
+  </script>
+
   <!-- Open Graph -->
   <meta property="og:site_name" content="RegLag" />
   <meta property="og:title" content="RegLag — {title}" />
