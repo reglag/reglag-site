@@ -2,6 +2,12 @@
 
 Receive RegLag by email.
 
+RegLag publishes a daily financial regulatory briefing.
+Subscribing means you’ll receive the full text of each published briefing by email, delivered at the same time it appears on the site.
+
+There are no promotions, tracking, or marketing emails.
+You can unsubscribe at any time.
+
 <form id="subscribe-form">
   <label for="email"><strong>Email address</strong></label><br />
   <input
