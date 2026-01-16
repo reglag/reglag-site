@@ -86,13 +86,34 @@ def infer_post_type_from_date(dt: datetime) -> str:
 
 def insert_post_type_after_h1(body_html: str, post_type: str) -> str:
     """
-    Insert a styled post-type subheading immediately after the first <h1>...</h1>.
-    If no <h1> exists, prepend it at the top.
+    Insert a styled post-type subheading after the title block.
+
+    Desired render order at the top of each post:
+      1) <h1>Title</h1>
+      2) Optional subtitle line rendered from a standalone italic paragraph
+         (Markdown: *Subtitle*  -> HTML: <p><em>Subtitle</em></p>)
+      3) Post type label (Daily Briefing / Weekend Deep Dive)
+
+    If no <h1> exists, prepend the label at the top.
     """
     tag = f'<h3 class="post-type">{xml_escape(post_type)}</h3>'
-    if "</h1>" in body_html:
-        return body_html.replace("</h1>", "</h1>\n" + tag, 1)
-    return tag + "\n" + body_html
+
+    if "</h1>" not in body_html:
+        return tag + "\n" + body_html
+
+    # If the first block after the H1 is an italic-only subtitle paragraph,
+    # insert the post-type label after that paragraph.
+    m = re.search(
+        r"(</h1>\s*)(<p>\s*<em>.*?</em>\s*</p>)",
+        body_html,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    if m:
+        insert_at = m.end(2)
+        return body_html[:insert_at] + "\n" + tag + body_html[insert_at:]
+
+    # Default: insert immediately after the H1.
+    return body_html.replace("</h1>", "</h1>\n" + tag, 1)
 
 
 # -----------------------------
