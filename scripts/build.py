@@ -19,7 +19,6 @@ OUT = ROOT / "publish" / "site"
 ARCHIVE = OUT / "briefings"
 ABOUT_SRC = ROOT / "about" / "index.md"
 PORTFOLIO_SRC = ROOT / "portfolio" / "index.md"
-SUBSCRIBE_SRC = ROOT / "subscribe" / "index.md"
 ASSETS_SRC = ROOT / "assets"
 ASSETS_OUT = OUT / "assets"
 
@@ -156,13 +155,13 @@ HTML = """<!doctype html>
 
   <!-- Structured data (Organization) -->
   <script type="application/ld+json">
-  {
+  {{
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "RegLag",
     "url": "https://reglag.com",
     "logo": "https://reglag.com/assets/logo/reglag-mark-128-tight.png"
-  }
+  }}
   </script>
 
   <!-- Open Graph -->
@@ -374,7 +373,6 @@ HTML = """<!doctype html>
         <a href="/briefings/index.html">Archive</a> ·
         <a href="/portfolio/index.html">Portfolio</a> ·
         <a href="/about/index.html">About</a> ·
-        <a href="/subscribe/">Subscribe</a> ·
         <a href="mailto:contact@reglag.com">Contact</a>
       </nav>
     </header>
@@ -390,7 +388,6 @@ HTML = """<!doctype html>
         <a href="/briefings/index.html">Archive</a> ·
         <a href="/portfolio/index.html">Portfolio</a> ·
         <a href="/about/index.html">About</a> ·
-        <a href="/subscribe/">Subscribe</a> ·
         <a href="/rss.xml">RSS</a> ·
         <a href="https://x.com/reglag_hq" rel="me noopener" target="_blank">X</a> ·
         <a href="mailto:contact@reglag.com">Contact</a>
@@ -542,17 +539,6 @@ def main() -> int:
         portfolio_out.mkdir(parents=True, exist_ok=True)
         (portfolio_out / "index.html").write_text(
             HTML.format(title="RegLag Model Portfolio", body=portfolio_html, canonical_url=f"{SITE_URL}/portfolio/"),
-            encoding="utf-8",
-        )
-
-
-    # Subscribe page
-    if SUBSCRIBE_SRC.exists():
-        subscribe_html = md_to_html(SUBSCRIBE_SRC.read_text(encoding="utf-8"))
-        subscribe_out = OUT / "subscribe"
-        subscribe_out.mkdir(parents=True, exist_ok=True)
-        (subscribe_out / "index.html").write_text(
-            HTML.format(title="Subscribe", body=subscribe_html, canonical_url=f"{SITE_URL}/subscribe/"),
             encoding="utf-8",
         )
 
