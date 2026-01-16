@@ -471,9 +471,36 @@ HTML = """<!doctype html>
       .footer-nav,
       .masthead-subtitle,
       .masthead-description,
-      hr {{
+      hr,
+      .site-footer,
+      .footer-disclaimer {{
         display: none !important;
       }}
+
+      /* Keep brand header but tighten spacing */
+      header {{
+        margin-bottom: 12px !important;
+      }}
+
+      .masthead-title {{
+        margin-bottom: 0 !important;
+      }}
+
+      .wrap {{
+        padding: 0 !important;
+      }}
+
+      /* Print footer disclaimer (single source of truth) */
+      body::after {{
+        content: "RegLag — Informational only. Not legal, financial, or compliance advice.";
+        display: block;
+        margin-top: 24px;
+        font-size: 10px;
+        color: #777;
+        border-top: 1px solid #e5e5e5;
+        padding-top: 8px;
+      }}
+    }}
 
       /* Keep brand header but tighten spacing */
       header {{
