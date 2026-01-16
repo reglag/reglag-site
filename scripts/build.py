@@ -158,48 +158,6 @@ def inject_post_type_label_md(md_body: str, post_type: str) -> str:
 
 
 
-
-def inject_pdf_link_md(md_body: str, date_str: str) -> str:
-    """Insert a small 'Download PDF' link near the top of the briefing.
-
-    Preferred placement: immediately after the first italic date line (*Month Day, Year*).
-    Fallbacks: after the post-type label HTML; then after the first H1.
-    """
-    pdf_html = f'<p class="pdf-link"><a href="/briefings/{date_str}.pdf">Download PDF</a></p>'
-
-    lines = md_body.splitlines()
-
-    def is_italic_line(line: str) -> bool:
-        s = line.strip()
-        return s.startswith('*') and s.endswith('*') and len(s) >= 3
-
-    def is_date_italic(line: str) -> bool:
-        inner = line.strip()[1:-1].strip()
-        months = ("January|February|March|April|May|June|July|August|September|October|November|December")
-        return bool(re.fullmatch(rf"({months}) \d{{1,2}}, \d{{4}}", inner)) or bool(re.fullmatch(r"\d{{4}}-\d{{2}}-\d{{2}}", inner))
-
-    # Preferred: insert right after the italic date line
-    for i, line in enumerate(lines):
-        if is_italic_line(line) and is_date_italic(line):
-            lines.insert(i + 1, pdf_html)
-            return "\n".join(lines)
-
-    # Fallback: insert after post-type label HTML
-    for i, line in enumerate(lines):
-        if 'class="post-type"' in line:
-            lines.insert(i + 1, pdf_html)
-            return "\n".join(lines)
-
-    # Final fallback: insert after first H1
-    for i, line in enumerate(lines):
-        if line.startswith("# "):
-            lines.insert(i + 1, "")
-            lines.insert(i + 2, pdf_html)
-            return "\n".join(lines)
-
-    return md_body
-
-
 # -----------------------------
 # RSS generation (optional: includes post_type prefix)
 # -----------------------------
@@ -209,7 +167,7 @@ def build_rss(items: list[tuple[str, str, str]], *, site_url: str) -> str:
     """
     channel_title = "RegLag — Daily Financial Regulatory Briefing"
     channel_desc = (
-        "RegLag is a financial regulatory briefing focused on source-based interpretation of regulatory, policy, and market-structure developments, with weekday coverage and weekend deep dives into enforcement and regulatory mechanisms."
+        "A daily financial regulatory briefing providing neutral, source-based insights. "
         "Informational only."
     )
 
@@ -447,39 +405,39 @@ HTML = """<!doctype html>
       color: var(--text-muted);
     }}
 
-    .pdf-link {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin: 8px 0 18px;
-    }}
-
-    .pdf-link a {{
-      color: inherit;
-      text-decoration: none;
-    }}
-
-    .pdf-link a:hover {{
-      text-decoration: underline;
-      color: var(--link-hover);
-    }}
-
     @media print {{
-      header,
+      /* Hide navigational chrome */
       nav,
       .top-nav,
       .footer-nav,
-      .masthead-title,
       .masthead-subtitle,
       .masthead-description,
-      .site-footer {{
+      hr {{
         display: none !important;
       }}
+
+      /* Keep brand header but tighten spacing */
+      header {{
+        margin-bottom: 12px !important;
+      }}
+
+      .masthead-title {{
+        margin-bottom: 0 !important;
+      }}
+
       .wrap {{
         padding: 0 !important;
       }}
-      hr {{
-        display: none !important;
+
+      /* Print footer disclaimer */
+      body::after {{
+        content: "RegLag — Informational only. Not legal, financial, or compliance advice.";
+        display: block;
+        margin-top: 24px;
+        font-size: 10px;
+        color: #777;
+        border-top: 1px solid #e5e5e5;
+        padding-top: 8px;
       }}
     }}
 
@@ -508,7 +466,7 @@ HTML = """<!doctype html>
         </a>
       </div>
       <div class="masthead-subtitle">Daily Financial Regulatory Briefing</div>
-      <div class="masthead-description">RegLag is a financial regulatory briefing focused on source-based interpretation of regulatory, policy, and market-structure developments, with weekday coverage and weekend deep dives into enforcement and regulatory mechanisms.</div>
+      <div class="masthead-description">RegLag is a daily briefing providing fast, source-based insights of financial regulatory and policy developments on weekdays, with weekend deep dives into enforcement, market structure, and regulatory mechanisms.</div>
       <hr />
       <nav class="top-nav">
         <a href="/">Latest</a> ·
@@ -594,8 +552,6 @@ def main() -> int:
             md_body = md_text
 
         md_body = inject_post_type_label_md(md_body, post_type)
-        md_body = inject_pdf_link_md(md_body, p.stem)
-
         body_html = md_to_html(md_body)
 
         canonical_url = f"{SITE_URL}/briefings/{p.stem}.html"
@@ -638,8 +594,6 @@ def main() -> int:
         md_body = latest_md
 
     md_body = inject_post_type_label_md(md_body, post_type)
-    md_body = inject_pdf_link_md(md_body, latest)
-
     home_body_html = md_to_html(md_body)
     home_html = HTML.format(
         title=latest_title,
