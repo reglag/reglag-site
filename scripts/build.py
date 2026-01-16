@@ -85,359 +85,60 @@ def infer_post_type_from_date(dt: datetime) -> str:
 
 
 def insert_post_type_after_h1(body_html: str, post_type: str) -> str:
-    """
-    Insert a styled post-type subheading after the title block.
+    """Insert a styled post-type label (e.g., 'Daily Briefing' / 'Weekend Deep Dive')
+    near the top of the post.
 
-    Desired render order at the top of each post:
-      1) <h1>Title</h1>
-      2) Optional subtitle line rendered from a standalone italic paragraph
-         (Markdown: *Subtitle*  -> HTML: <p><em>Subtitle</em></p>)
-      3) Post type label (Daily Briefing / Weekend Deep Dive)
+    Desired render order:
+      1) H1 title
+      2) Optional italic subtitle line (a standalone <p><em>…</em></p>)
+      3) Post type label
+      4) Date line (usually an italic standalone paragraph)
 
-    If no <h1> exists, prepend the label at the top.
+    Rules:
+      - If the first italic paragraph after the H1 looks like a date, insert the label BEFORE it.
+      - If there are TWO consecutive italic paragraphs after the H1, treat them as:
+          subtitle (1st), date (2nd), and insert the label BETWEEN them.
+      - Otherwise, insert the label after the H1 (or after a non-date subtitle).
     """
     tag = f'<h3 class="post-type">{xml_escape(post_type)}</h3>'
 
     if "</h1>" not in body_html:
         return tag + "\n" + body_html
 
-    # If the first block after the H1 is an italic-only subtitle paragraph,
-    # insert the post-type label after that paragraph.
-    m = re.search(
-        r"(</h1>\s*)(<p>\s*<em>.*?</em>\s*</p>)",
-        body_html,
-        flags=re.IGNORECASE | re.DOTALL,
-    )
-    if m:
-        insert_at = m.end(2)
-        return body_html[:insert_at] + "\n" + tag + body_html[insert_at:]
+    def _looks_like_date(text: str) -> bool:
+        # Accept either 'January 16, 2026' or '2026-01-16'
+        t = re.sub(r"\s+", " ", text.strip())
+        month = r"(January|February|March|April|May|June|July|August|September|October|November|December)"
+        return bool(re.fullmatch(rf"{month} \d{{1,2}}, \d{{4}}", t)) or bool(re.fullmatch(r"\d{4}-\d{2}-\d{2}", t))
 
-    # Default: insert immediately after the H1.
+    # Two consecutive italic-only paragraphs after the H1 => subtitle then date.
+    two_italics_re = re.compile(
+        r"(</h1>\s*)"
+        r"(<p>\s*<em>(?P<i1>.*?)</em>\s*</p>\s*)"
+        r"(<p>\s*<em>(?P<i2>.*?)</em>\s*</p>\s*)",
+        re.IGNORECASE | re.DOTALL,
+    )
+    m2 = two_italics_re.search(body_html)
+    if m2:
+        insert_at = m2.start(3)  # start of the second italic paragraph (date)
+        return body_html[:insert_at] + tag + "\n" + body_html[insert_at:]
+
+    # One italic-only paragraph after the H1 => either date OR subtitle.
+    one_italic_re = re.compile(
+        r"(</h1>\s*)(<p>\s*<em>(?P<i1>.*?)</em>\s*</p>\s*)",
+        re.IGNORECASE | re.DOTALL,
+    )
+    m1 = one_italic_re.search(body_html)
+    if m1:
+        italic_text = re.sub(r"<.*?>", "", m1.group("i1"))
+        if _looks_like_date(italic_text):
+            insert_at = m1.start(2)  # before date paragraph
+            return body_html[:insert_at] + tag + "\n" + body_html[insert_at:]
+        else:
+            insert_at = m1.end(2)  # after subtitle paragraph
+            return body_html[:insert_at] + tag + "\n" + body_html[insert_at:]
+
     return body_html.replace("</h1>", "</h1>\n" + tag, 1)
-
-
-# -----------------------------
-# RSS generation (optional: includes post_type prefix)
-# -----------------------------
-def build_rss(items: list[tuple[str, str, str]], *, site_url: str) -> str:
-    """
-    items: list of (date_str 'YYYY-MM-DD', post_type, title) in reverse chronological order
-    """
-    channel_title = "RegLag — Daily Financial Regulatory Briefing"
-    channel_desc = (
-        "A daily financial regulatory briefing providing neutral, source-based insights. "
-        "Informational only."
-    )
-
-    now = format_datetime(datetime.now(timezone.utc))
-
-    lines = [
-        '<?xml version="1.0" encoding="UTF-8"?>',
-        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
-        "  <channel>",
-        f"    <title>{xml_escape(channel_title)}</title>",
-        f"    <link>{xml_escape(site_url)}</link>",
-        f"    <description>{xml_escape(channel_desc)}</description>",
-        f"    <lastBuildDate>{now}</lastBuildDate>",
-        f'    <atom:link href="{xml_escape(site_url + "/rss.xml")}" rel="self" type="application/rss+xml" />',
-    ]
-
-    for date_str, post_type, title in items:
-        dt = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-        pub = format_datetime(dt)
-        url = f"{site_url}/briefings/{date_str}.html"
-
-        rss_title = f"{post_type} — {title}"
-
-        lines += [
-            "    <item>",
-            f"      <title>{xml_escape(rss_title)}</title>",
-            f"      <link>{xml_escape(url)}</link>",
-            f'      <guid isPermaLink="true">{xml_escape(url)}</guid>',
-            f"      <pubDate>{pub}</pubDate>",
-            "    </item>",
-        ]
-
-    lines += ["  </channel>", "</rss>"]
-    return "\n".join(lines) + "\n"
-
-
-# -----------------------------
-# HTML template
-# -----------------------------
-HTML = """<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RegLag — Daily Financial Regulatory Briefing — {title}</title>
-
-  <!-- Canonical -->
-  <link rel="canonical" href="{canonical_url}" />
-
-  <!-- Structured data (Organization) -->
-  <script type="application/ld+json">
-  {{
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "RegLag",
-    "url": "https://reglag.com",
-    "logo": "https://reglag.com/assets/logo/reglag-mark-128-tight.png"
-  }}
-  </script>
-
-  <!-- Open Graph -->
-  <meta property="og:site_name" content="RegLag" />
-  <meta property="og:title" content="RegLag — {title}" />
-  <meta property="og:url" content="{canonical_url}" />
-
-  <!-- RSS -->
-  <link rel="alternate" type="application/rss+xml" title="RegLag RSS" href="/rss.xml" />
-
-  <!-- Icons -->
-  <link rel="icon" href="/favicon.ico" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
-
-  <!-- 100% privacy-first analytics -->
-  <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-
-  <style>
-    :root {{
-      --bg: #ffffff;
-      --text-primary: #111111;
-      --text-secondary: #555555;
-      --text-muted: #777777;
-      --divider: #e5e5e5;
-      --accent: #243447;
-      --link: #243447;
-      --link-hover: #111111;
-    }}
-
-    body {{
-      margin: 0;
-      background: var(--bg);
-      color: var(--text-primary);
-      font-family: Georgia, "Source Serif 4", serif;
-      font-size: 17px;
-      line-height: 1.62;
-      text-rendering: optimizeLegibility;
-      -webkit-font-smoothing: antialiased;
-    }}
-
-    .wrap {{
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 28px 22px 60px;
-    }}
-
-    .masthead-title {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      font-weight: 600;
-      color: var(--accent);
-    }}
-
-    .masthead-title a {{
-      color: inherit;
-      text-decoration: none;
-    }}
-
-    .masthead-title a:hover {{
-      text-decoration: none;
-    }}
-
-    .masthead-title .brand {{
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-    }}
-
-    .brand-mark {{
-      display: block;
-      width: 28px;
-      height: 28px;
-    }}
-
-    .masthead-subtitle {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 2px;
-    }}
-
-    .masthead-description {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 4px;
-      font-style: italic;
-    }}
-
-    hr {{
-      border: none;
-      border-top: 1px solid var(--divider);
-      margin: 16px 0 28px;
-    }}
-
-    .top-nav {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin: -8px 0 24px;
-    }}
-
-    .top-nav a {{
-      color: inherit;
-      text-decoration: none;
-    }}
-
-    .top-nav a:hover {{
-      text-decoration: underline;
-      color: var(--link-hover);
-    }}
-
-    /* Key: post type should look like a subheading, not a headline */
-    .post-type {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      margin: 10px 0 6px;
-    }}
-
-    h1 {{
-      font-size: 26px;
-      line-height: 1.25;
-      margin: 0 0 14px;
-    }}
-
-    h2 {{
-      margin-top: 32px;
-      line-height: 1.25;
-    }}
-
-    h3 {{
-      margin-top: 22px;
-      line-height: 1.25;
-    }}
-
-    p {{
-      margin: 0 0 14px;
-    }}
-
-    ul, ol {{
-      margin: 0 0 14px 1.1em;
-      padding: 0;
-    }}
-
-    li {{
-      margin: 0 0 6px;
-    }}
-
-    a {{
-      color: var(--link);
-      text-decoration: none;
-    }}
-
-    a:hover {{
-      text-decoration: underline;
-      color: var(--link-hover);
-    }}
-
-    .site-footer {{
-      margin-top: 48px;
-    }}
-
-    .footer-nav {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 13px;
-      color: var(--text-secondary);
-    }}
-
-    .footer-disclaimer {{
-      margin-top: 12px;
-      font-size: 12px;
-      color: var(--text-muted);
-    }}
-
-    @media (max-width: 520px) {{
-      body {{ font-size: 16px; line-height: 1.68; }}
-      h1 {{ font-size: 22px; }}
-      .wrap {{ padding: 22px 16px 56px; }}
-      .post-type {{ font-size: 13px; }}
-    }}
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <header>
-      <div class="masthead-title">
-        <a class="brand" href="/">
-          <img
-            src="/assets/logo/reglag-mark-128-tight.png"
-            alt="RegLag"
-            class="brand-mark"
-            width="28"
-            height="28"
-            decoding="async"
-          />
-          <span>REGLAG</span>
-        </a>
-      </div>
-      <div class="masthead-subtitle">Daily Financial Regulatory Briefing</div>
-      <div class="masthead-description">RegLag is a daily briefing providing fast, source-based insights of financial regulatory and policy developments on weekdays, with weekend deep dives into enforcement, market structure, and regulatory mechanisms.</div>
-      <hr />
-      <nav class="top-nav">
-        <a href="/">Latest</a> ·
-        <a href="/briefings/index.html">Archive</a> ·
-        <a href="/portfolio/index.html">Portfolio</a> ·
-        <a href="/about/index.html">About</a> ·
-        <a href="/subscribe/">Subscribe</a> ·
-        <a href="mailto:contact@reglag.com">Contact</a>
-      </nav>
-    </header>
-
-    <main>
-      {body}
-    </main>
-
-    <footer class="site-footer">
-      <hr />
-      <nav class="footer-nav">
-        <a href="/">Latest</a> ·
-        <a href="/briefings/index.html">Archive</a> ·
-        <a href="/portfolio/index.html">Portfolio</a> ·
-        <a href="/about/index.html">About</a> ·
-        <a href="/subscribe/">Subscribe</a> ·
-        <a href="/rss.xml">RSS</a> ·
-        <a href="https://x.com/reglag_hq" rel="me noopener" target="_blank">X</a> ·
-        <a href="mailto:contact@reglag.com">Contact</a>
-      </nav>
-      <div class="footer-disclaimer">
-        Informational only. Not legal, financial, or compliance advice.
-      </div>
-    </footer>
-  </div>
-</body>
-</html>
-"""
-
-
-# -----------------------------
-# Main build
-# -----------------------------
-def main() -> int:
-    OUT.mkdir(parents=True, exist_ok=True)
-    ARCHIVE.mkdir(parents=True, exist_ok=True)
-
-    # Copy static assets (logo + icons) into the published site root.
-    if ASSETS_SRC.exists():
-        if ASSETS_OUT.exists():
-            shutil.rmtree(ASSETS_OUT)
-        shutil.copytree(ASSETS_SRC, ASSETS_OUT)
 
     # Copy root favicon for Safari compatibility
     root_favicon_src = ASSETS_SRC / "icons" / "favicon.ico"
