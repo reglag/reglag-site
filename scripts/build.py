@@ -464,6 +464,25 @@ HTML = """<!doctype html>
       color: var(--link-hover);
     }}
 
+    @media print {{
+      header,
+      nav,
+      .top-nav,
+      .footer-nav,
+      .masthead-title,
+      .masthead-subtitle,
+      .masthead-description,
+      .site-footer {{
+        display: none !important;
+      }}
+      .wrap {{
+        padding: 0 !important;
+      }}
+      hr {{
+        display: none !important;
+      }}
+    }}
+
     @media (max-width: 520px) {{
       body {{ font-size: 16px; line-height: 1.68; }}
       h1 {{ font-size: 22px; }}
