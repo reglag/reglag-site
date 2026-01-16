@@ -19,6 +19,7 @@ OUT = ROOT / "publish" / "site"
 ARCHIVE = OUT / "briefings"
 ABOUT_SRC = ROOT / "about" / "index.md"
 PORTFOLIO_SRC = ROOT / "portfolio" / "index.md"
+SUBSCRIBE_SRC = ROOT / "subscribe" / "index.md"
 ASSETS_SRC = ROOT / "assets"
 ASSETS_OUT = OUT / "assets"
 
@@ -93,47 +94,67 @@ def insert_post_type_after_h1(body_html: str, post_type: str) -> str:
         return body_html.replace("</h1>", "</h1>\n" + tag, 1)
     return tag + "\n" + body_html
 
-
-
-def inject_pdf_link_md(md_body: str, date_str: str) -> str:
-    """Insert a small 'Download PDF' link near the top of the briefing.
-
-    Preferred placement: immediately after the first italic date line (*Month Day, Year*).
-    Fallbacks: after the post-type label HTML; then after the first H1.
-    """
-    pdf_html = f'<p class="pdf-link"><a href="/briefings/{date_str}.pdf">Download PDF</a></p>'
+def inject_post_type_label_md(md_body: str, post_type: str) -> str:
+    # Insert the visible post-type label as raw HTML so ordering is deterministic.
+    # Desired order:
+    #   1) H1 title
+    #   2) Optional italic subtitle line (single-line *...*)
+    #   3) Post type label
+    #   4) Date line (single-line *Month Day, Year*)
 
     lines = md_body.splitlines()
+    # Find first H1
+    h1_idx = None
+    for i, line in enumerate(lines):
+        if line.startswith('# '):
+            h1_idx = i
+            break
+    if h1_idx is None:
+        return md_body
+
+    def looks_like_date(line: str) -> bool:
+        s = line.strip()
+        # Expect single-line italic wrapper: *January 16, 2026* or *2026-01-16*
+        if not (s.startswith('*') and s.endswith('*') and len(s) >= 3):
+            return False
+        inner = s[1:-1].strip()
+        month = r'(January|February|March|April|May|June|July|August|September|October|November|December)'
+        return bool(re.fullmatch(rf'{month} \d{{1,2}}, \d{{4}}', inner)) or bool(re.fullmatch(r'\d{4}-\d{2}-\d{2}', inner))
 
     def is_italic_line(line: str) -> bool:
         s = line.strip()
         return s.startswith('*') and s.endswith('*') and len(s) >= 3
 
-    def is_date_italic(line: str) -> bool:
-        inner = line.strip()[1:-1].strip()
-        months = ("January|February|March|April|May|June|July|August|September|October|November|December")
-        return bool(re.fullmatch(rf"({months}) \d{{1,2}}, \d{{4}}", inner)) or bool(re.fullmatch(r"\d{{4}}-\d{{2}}-\d{{2}}", inner))
+    # Determine insertion point after H1 and optional subtitle.
+    j = h1_idx + 1
+    # Skip blank lines
+    while j < len(lines) and lines[j].strip() == '':
+        j += 1
 
-    # Preferred: insert right after the italic date line
-    for i, line in enumerate(lines):
-        if is_italic_line(line) and is_date_italic(line):
-            lines.insert(i + 1, pdf_html)
-            return "\n".join(lines)
+    insert_at = None
 
-    # Fallback: insert after post-type label HTML
-    for i, line in enumerate(lines):
-        if 'class="post-type"' in line:
-            lines.insert(i + 1, pdf_html)
-            return "\n".join(lines)
+    # Case A: First nonblank line is an italic line.
+    if j < len(lines) and is_italic_line(lines[j]):
+        # If it looks like a date, there is no subtitle; insert BEFORE date.
+        if looks_like_date(lines[j]):
+            insert_at = j
+        else:
+            # Treat as subtitle; look for next nonblank line.
+            k = j + 1
+            while k < len(lines) and lines[k].strip() == '':
+                k += 1
+            # If next italic looks like a date, insert before it; else insert after subtitle block.
+            if k < len(lines) and looks_like_date(lines[k]):
+                insert_at = k
+            else:
+                insert_at = j + 1
+    else:
+        # No italic line immediately after title; insert right after title block.
+        insert_at = j
 
-    # Final fallback: insert after first H1
-    for i, line in enumerate(lines):
-        if line.startswith("# "):
-            lines.insert(i + 1, "")
-            lines.insert(i + 2, pdf_html)
-            return "\n".join(lines)
-
-    return md_body
+    label_html = f'<h3 class="post-type">{xml_escape(post_type)}</h3>'
+    lines.insert(insert_at, label_html)
+    return "\n".join(lines)
 
 
 
@@ -195,6 +216,17 @@ HTML = """<!doctype html>
 
   <!-- Canonical -->
   <link rel="canonical" href="{canonical_url}" />
+
+  <!-- Structured data (Organization) -->
+  <script type="application/ld+json">
+  {{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "RegLag",
+    "url": "https://reglag.com",
+    "logo": "https://reglag.com/assets/logo/reglag-mark-128-tight.png"
+  }}
+  </script>
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="RegLag" />
@@ -373,61 +405,6 @@ HTML = """<!doctype html>
       color: var(--text-muted);
     }}
 
-
-    .pdf-link {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin: 8px 0 18px;
-    }}
-
-    .pdf-link a {{
-      color: inherit;
-      text-decoration: none;
-    }}
-
-    .pdf-link a:hover {{
-      text-decoration: underline;
-      color: var(--link-hover);
-    }}
-
-
-    @media print {{
-      /* Hide site navigation chrome in PDFs */
-      nav,
-      .top-nav,
-      .footer-nav,
-      .masthead-subtitle,
-      .masthead-description,
-      hr,
-      .site-footer,
-      .footer-disclaimer {{
-        display: none !important;
-      }}
-
-      /* Hide PDF download link inside PDFs */
-      .pdf-link {{ display: none !important; }}
-
-      /* Keep brand header but tighten spacing */
-      header {{
-        margin-bottom: 12px !important;
-      }}
-      .masthead-title {{
-        margin-bottom: 0 !important;
-      }}
-
-      /* Print-only disclaimer (single source of truth) */
-      body::after {{
-        content: "RegLag — Informational only. Not legal, financial, or compliance advice.";
-        display: block;
-        margin-top: 24px;
-        font-size: 10px;
-        color: #777;
-        border-top: 1px solid #e5e5e5;
-        padding-top: 8px;
-      }}
-    }}
-
     @media (max-width: 520px) {{
       body {{ font-size: 16px; line-height: 1.68; }}
       h1 {{ font-size: 22px; }}
@@ -460,6 +437,7 @@ HTML = """<!doctype html>
         <a href="/briefings/index.html">Archive</a> ·
         <a href="/portfolio/index.html">Portfolio</a> ·
         <a href="/about/index.html">About</a> ·
+        <a href="/subscribe/">Subscribe</a> ·
         <a href="mailto:contact@reglag.com">Contact</a>
       </nav>
     </header>
@@ -475,6 +453,7 @@ HTML = """<!doctype html>
         <a href="/briefings/index.html">Archive</a> ·
         <a href="/portfolio/index.html">Portfolio</a> ·
         <a href="/about/index.html">About</a> ·
+        <a href="/subscribe/">Subscribe</a> ·
         <a href="/rss.xml">RSS</a> ·
         <a href="https://x.com/reglag_hq" rel="me noopener" target="_blank">X</a> ·
         <a href="mailto:contact@reglag.com">Contact</a>
@@ -536,8 +515,8 @@ def main() -> int:
             post_type = infer_post_type_from_date(dt)
             md_body = md_text
 
+        md_body = inject_post_type_label_md(md_body, post_type)
         body_html = md_to_html(md_body)
-        body_html = insert_post_type_after_h1(body_html, post_type)
 
         canonical_url = f"{SITE_URL}/briefings/{p.stem}.html"
         html = HTML.format(title=title, body=body_html, canonical_url=canonical_url)
@@ -578,8 +557,8 @@ def main() -> int:
         post_type = infer_post_type_from_date(dt)
         md_body = latest_md
 
+    md_body = inject_post_type_label_md(md_body, post_type)
     home_body_html = md_to_html(md_body)
-    home_body_html = insert_post_type_after_h1(home_body_html, post_type)
     home_html = HTML.format(
         title=latest_title,
         body=home_body_html,
@@ -626,6 +605,17 @@ def main() -> int:
         portfolio_out.mkdir(parents=True, exist_ok=True)
         (portfolio_out / "index.html").write_text(
             HTML.format(title="RegLag Model Portfolio", body=portfolio_html, canonical_url=f"{SITE_URL}/portfolio/"),
+            encoding="utf-8",
+        )
+
+
+    # Subscribe page
+    if SUBSCRIBE_SRC.exists():
+        subscribe_html = md_to_html(SUBSCRIBE_SRC.read_text(encoding="utf-8"))
+        subscribe_out = OUT / "subscribe"
+        subscribe_out.mkdir(parents=True, exist_ok=True)
+        (subscribe_out / "index.html").write_text(
+            HTML.format(title="Subscribe", body=subscribe_html, canonical_url=f"{SITE_URL}/subscribe/"),
             encoding="utf-8",
         )
 
