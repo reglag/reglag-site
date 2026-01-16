@@ -86,34 +86,76 @@ def infer_post_type_from_date(dt: datetime) -> str:
 
 def insert_post_type_after_h1(body_html: str, post_type: str) -> str:
     """
-    Insert a styled post-type subheading after the title block.
-
-    Desired render order at the top of each post:
-      1) <h1>Title</h1>
-      2) Optional subtitle line rendered from a standalone italic paragraph
-         (Markdown: *Subtitle*  -> HTML: <p><em>Subtitle</em></p>)
-      3) Post type label (Daily Briefing / Weekend Deep Dive)
-
-    If no <h1> exists, prepend the label at the top.
+    Insert a styled post-type subheading immediately after the first <h1>...</h1>.
+    If no <h1> exists, prepend it at the top.
     """
     tag = f'<h3 class="post-type">{xml_escape(post_type)}</h3>'
+    if "</h1>" in body_html:
+        return body_html.replace("</h1>", "</h1>\n" + tag, 1)
+    return tag + "\n" + body_html
 
-    if "</h1>" not in body_html:
-        return tag + "\n" + body_html
+def inject_post_type_label_md(md_body: str, post_type: str) -> str:
+    # Insert the visible post-type label as raw HTML so ordering is deterministic.
+    # Desired order:
+    #   1) H1 title
+    #   2) Optional italic subtitle line (single-line *...*)
+    #   3) Post type label
+    #   4) Date line (single-line *Month Day, Year*)
 
-    # If the first block after the H1 is an italic-only subtitle paragraph,
-    # insert the post-type label after that paragraph.
-    m = re.search(
-        r"(</h1>\s*)(<p>\s*<em>.*?</em>\s*</p>)",
-        body_html,
-        flags=re.IGNORECASE | re.DOTALL,
-    )
-    if m:
-        insert_at = m.end(2)
-        return body_html[:insert_at] + "\n" + tag + body_html[insert_at:]
+    lines = md_body.splitlines()
+    # Find first H1
+    h1_idx = None
+    for i, line in enumerate(lines):
+        if line.startswith('# '):
+            h1_idx = i
+            break
+    if h1_idx is None:
+        return md_body
 
-    # Default: insert immediately after the H1.
-    return body_html.replace("</h1>", "</h1>\n" + tag, 1)
+    def looks_like_date(line: str) -> bool:
+        s = line.strip()
+        # Expect single-line italic wrapper: *January 16, 2026* or *2026-01-16*
+        if not (s.startswith('*') and s.endswith('*') and len(s) >= 3):
+            return False
+        inner = s[1:-1].strip()
+        month = r'(January|February|March|April|May|June|July|August|September|October|November|December)'
+        return bool(re.fullmatch(rf'{month} \d{{1,2}}, \d{{4}}', inner)) or bool(re.fullmatch(r'\d{4}-\d{2}-\d{2}', inner))
+
+    def is_italic_line(line: str) -> bool:
+        s = line.strip()
+        return s.startswith('*') and s.endswith('*') and len(s) >= 3
+
+    # Determine insertion point after H1 and optional subtitle.
+    j = h1_idx + 1
+    # Skip blank lines
+    while j < len(lines) and lines[j].strip() == '':
+        j += 1
+
+    insert_at = None
+
+    # Case A: First nonblank line is an italic line.
+    if j < len(lines) and is_italic_line(lines[j]):
+        # If it looks like a date, there is no subtitle; insert BEFORE date.
+        if looks_like_date(lines[j]):
+            insert_at = j
+        else:
+            # Treat as subtitle; look for next nonblank line.
+            k = j + 1
+            while k < len(lines) and lines[k].strip() == '':
+                k += 1
+            # If next italic looks like a date, insert before it; else insert after subtitle block.
+            if k < len(lines) and looks_like_date(lines[k]):
+                insert_at = k
+            else:
+                insert_at = j + 1
+    else:
+        # No italic line immediately after title; insert right after title block.
+        insert_at = j
+
+    label_html = f'<h3 class="post-type">{xml_escape(post_type)}</h3>'
+    lines.insert(insert_at, label_html)
+    return "\n".join(lines)
+
 
 
 # -----------------------------
@@ -473,8 +515,8 @@ def main() -> int:
             post_type = infer_post_type_from_date(dt)
             md_body = md_text
 
+        md_body = inject_post_type_label_md(md_body, post_type)
         body_html = md_to_html(md_body)
-        body_html = insert_post_type_after_h1(body_html, post_type)
 
         canonical_url = f"{SITE_URL}/briefings/{p.stem}.html"
         html = HTML.format(title=title, body=body_html, canonical_url=canonical_url)
@@ -515,8 +557,8 @@ def main() -> int:
         post_type = infer_post_type_from_date(dt)
         md_body = latest_md
 
+    md_body = inject_post_type_label_md(md_body, post_type)
     home_body_html = md_to_html(md_body)
-    home_body_html = insert_post_type_after_h1(home_body_html, post_type)
     home_html = HTML.format(
         title=latest_title,
         body=home_body_html,
