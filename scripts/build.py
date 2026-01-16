@@ -530,8 +530,7 @@ HTML = """<!doctype html>
         <a href="/briefings/index.html">Archive</a> ·
         <a href="/portfolio/index.html">Portfolio</a> ·
         <a href="/about/index.html">About</a> ·
-        <a href="/subscribe/">Subscribe</a> ·
-        <a href="mailto:contact@reglag.com">Contact</a>
+        <a href="/subscribe/">Subscribe</a>
       </nav>
     </header>
 
