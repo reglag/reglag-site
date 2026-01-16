@@ -1,21 +1,19 @@
-# About RegLag
+## About RegLag
 
-RegLag is a daily financial regulatory briefing written to be read quickly, with structured interpretation and forward-looking context, but without advocacy or recommendations.
+RegLag is a daily financial regulatory briefing that provides source-based interpretation of regulatory, policy, and market-structure developments as they operate in practice. It is designed to make evolving institutional and regulatory signals legible without reacting to headlines or market noise.
 
-Each edition summarizes notable developments across financial regulation, market structure, and adjacent policy areas that may affect financial institutions, markets, and regulated activity. The focus is on clarity, discipline, and source-based analysis.
+RegLag focuses on how regulatory and policy signals accumulate into real-world constraints — including liquidity, balance-sheet capacity, and operational execution — rather than forecasting outcomes or offering recommendations.
 
-RegLag publishes a daily financial regulatory briefing during the week and longer-form weekend deep dives that examine specific enforcement regimes, market structure mechanisms, and regulatory transmission channels. Daily briefings focus on situational awareness. Weekend deep dives focus on explanation, pattern detection, and forward-looking questions.
+The briefing emphasizes primary sources, structural context, and continuity of judgment. Coverage prioritizes how rules, supervision, and enforcement function under real-world conditions, particularly during periods of institutional stress, adaptation, or credibility drift.
 
-The name RegLag reflects a simple reality: regulatory decisions, disclosures, and enforcement actions often affect markets and institutions with a delay. RegLag focuses on understanding that gap—between policy action and real-world impact.
+RegLag is intended for professionals and readers seeking disciplined interpretive context around financial regulation and policy developments, not tactical commentary or opinion.
 
-We are an independent publication and not affiliated with, sponsored by, or acting on behalf of any financial institution, regulator, or market participant.
+### What RegLag is not
 
-## What RegLag is not
+- RegLag is not legal, financial, or compliance advice.  
+- It does not interpret obligations, recommend actions, or substitute for professional judgment.  
+- RegLag is not a monitoring or alerting service.  
+- RegLag is not market commentary or headline analysis; it prioritizes structure over immediacy.  
+- RegLag does not publish sponsored or promotional content.
 
-RegLag is not legal, financial, or compliance advice. It does not interpret obligations, recommend actions, or substitute for professional judgment or counsel.
-
-RegLag is not a monitoring tool, alerting system, or automated compliance product. It does not claim completeness or real-time coverage.
-
-RegLag is not a marketing publication. It does not promote products, services, or affiliations, and it does not publish sponsored content.
-
-RegLag is an informational publication only.
+RegLag is an informational publication intended for context and interpretation, not professional advice or decision support.
