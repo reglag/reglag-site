@@ -38,6 +38,26 @@ jobs:
         run: |
           python scripts/build.py
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm i -D playwright
+          npx playwright install --with-deps chromium
+
+      - name: Serve site locally
+        run: |
+          python3 -m http.server 8000 --directory publish/site &
+          sleep 1
+
+      - name: Render PDFs
+        run: |
+          node scripts/render_pdfs.mjs
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
