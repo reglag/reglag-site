@@ -465,6 +465,9 @@ HTML = """<!doctype html>
     }}
 
     @media print {{
+      /* Hide PDF download link in PDFs */
+      .pdf-link { display: none !important; }
+
       /* Hide navigational chrome */
       nav,
       .top-nav,
