@@ -16,35 +16,21 @@ function listBriefingHtmlFiles() {
 
 function shortFooter() {
   return `
-    <div style="
-      max-width: 820px;
-      margin: 0 auto;
-      font-size: 9px;
-      color: #777;
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      display: flex;
-      justify-content: space-between;
-      box-sizing: border-box;
-    ">
-      <div>© 2026 RegLag | reglag.com</div>
-      <div><span class="pageNumber"></span> / <span class="totalPages"></span></div>
+    <div style="width:100%; box-sizing:border-box; padding-left:0.75in; padding-right:0.75in; font-family:'JetBrains Mono', ui-monospace, monospace; font-size:9px; color:#777;">
+      <div style="width:100%; display:flex; justify-content:space-between; align-items:flex-end;">
+        <div>© 2026 RegLag | reglag.com</div>
+        <div><span class="pageNumber"></span> / <span class="totalPages"></span></div>
+      </div>
     </div>
   `;
 }
 
 function firstPageFooter() {
   return `
-    <div style="
-      max-width: 820px;
-      margin: 0 auto;
-      font-size: 9px;
-      color: #777;
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      box-sizing: border-box;
-    ">
-      <div>Original RegLag analysis and commentary. Informational only; not investment, legal, or regulatory advice.</div>
-      <div>Free to share in full for non-commercial purposes with attribution to RegLag.</div>
-      <div style="display:flex; justify-content:space-between; margin-top:4px;">
+    <div style="width:100%; box-sizing:border-box; padding-left:0.75in; padding-right:0.75in; font-family:'JetBrains Mono', ui-monospace, monospace; font-size:9px; color:#777;">
+      <div style="margin-bottom:2px;">Original RegLag analysis and commentary. Informational only; not investment, legal, or regulatory advice.</div>
+      <div style="margin-bottom:4px;">Free to share in full for non-commercial purposes with attribution to RegLag.</div>
+      <div style="width:100%; display:flex; justify-content:space-between; align-items:flex-end;">
         <div>© 2026 RegLag | reglag.com</div>
         <div><span class="pageNumber"></span> / <span class="totalPages"></span></div>
       </div>
