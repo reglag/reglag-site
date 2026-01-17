@@ -571,7 +571,7 @@ HTML = """<!doctype html>
         <a href="/about/index.html">About</a> ·
         <a href="/subscribe/">Subscribe</a> ·
         <a href="/legal/index.html">Legal &amp; Privacy</a> ·
-        <a href="/rss.xml">RSS</a ·
+        <a href="/rss.xml">RSS</a> ·
         <a href="https://x.com/reglag_hq" rel="me noopener" target="_blank">X</a> ·
         <a href="mailto:contact@reglag.com">Contact</a>
       </nav>
