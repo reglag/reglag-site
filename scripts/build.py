@@ -713,11 +713,35 @@ def main() -> int:
     )
     (OUT / "index.html").write_text(home_html, encoding="utf-8")
 
-    # Archive index (clickable + labeled)
-    archive_html = "<h1>Briefing Archive</h1>"
-    current_month = None
+    
+    # Archive index (reorganized by type, then date)
+    deep_dives = []
+    dailies = []
 
     for date_str, post_type, title in archive_items:
+        if post_type == "Weekend Deep Dive":
+            deep_dives.append((date_str, title))
+        else:
+            dailies.append((date_str, title))
+
+    archive_html = "<h1>Briefing Archive</h1>"
+    archive_html += '<p><a href="#weekend-deep-dives">Weekend Deep Dives</a> · <a href="#daily-briefings">Daily Briefings</a></p>'
+
+    # Weekend Deep Dives
+    archive_html += '<h2 id="weekend-deep-dives">Weekend Deep Dives</h2>'
+
+    for date_str, title in deep_dives:
+        dt = datetime.strptime(date_str, "%Y-%m-%d")
+        display_date = format_spelled_date(dt)
+        pdf_path = ARCHIVE / f"{date_str}.pdf"
+        pdf_link = " (PDF)" if pdf_path.exists() else ""
+        archive_html += f'<p>{display_date} — <a href="/briefings/{date_str}.html">{xml_escape(title)}</a>{pdf_link}</p>'
+
+    # Daily Briefings
+    archive_html += '<h2 id="daily-briefings">Daily Briefings</h2>'
+
+    current_month = None
+    for date_str, title in dailies:
         dt = datetime.strptime(date_str, "%Y-%m-%d")
         month_label = dt.strftime("%B %Y")
 
@@ -725,13 +749,15 @@ def main() -> int:
             archive_html += f"<h3>{month_label}</h3>"
             current_month = month_label
 
-        prefix = f"{format_spelled_date(dt)} — {post_type} — "
-        display_html = f'{xml_escape(prefix)}<em>{xml_escape(title)}</em>'
-        url = f"/briefings/{date_str}.html"
-        archive_html += f'<p><a href="{url}">{display_html}</a></p>'
+        display_date = format_spelled_date(dt)
+        archive_html += f'<p>{display_date} — <a href="/briefings/{date_str}.html">{xml_escape(title)}</a></p>'
 
     (ARCHIVE / "index.html").write_text(
-        HTML.format(title="Briefing Archive", body=archive_html, canonical_url=f"{SITE_URL}/briefings/"),
+        HTML.format(
+            title="Briefing Archive",
+            body=archive_html,
+            canonical_url=f"{SITE_URL}/briefings/",
+        ),
         encoding="utf-8",
     )
 
