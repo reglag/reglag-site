@@ -494,6 +494,30 @@ HTML = """<!doctype html>
 
 
     @media print {{
+
+      /* Align PDF body column to physical page margins (not centered web layout) */
+      .wrap {{
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }}
+
+      /* Keep headings with first content block to avoid orphan headings */
+      h2, h3 {{
+        break-after: avoid-page;
+        page-break-after: avoid;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }}
+
+      h2 + p, h3 + p,
+      h2 + ul, h3 + ul,
+      h2 + ol, h3 + ol {{
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }}
+
+
       .footer-meta {{ display: none !important; }}
 
       /* Hide navigational chrome in PDFs */
