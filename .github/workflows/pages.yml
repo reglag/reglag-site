@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -54,6 +54,28 @@ jobs:
       - name: Render PDFs
         run: |
           node scripts/render_pdfs.mjs
+
+      - name: Send email (Postmark)
+        env:
+          POSTMARK_SERVER_TOKEN: ${{ secrets.POSTMARK_SERVER_TOKEN }}
+          REGLAG_FROM_EMAIL: ${{ secrets.REGLAG_FROM_EMAIL }}
+          REGLAG_REPLY_TO: ${{ secrets.REGLAG_REPLY_TO }}
+          EMAIL_SEND_ENABLED: ${{ vars.EMAIL_SEND_ENABLED }}
+        run: |
+          node scripts/send_postmark_broadcast.mjs
+
+      - name: Commit sent log (idempotency)
+        if: ${{ vars.EMAIL_SEND_ENABLED == 'true' }}
+        run: |
+          if git diff --quiet -- email/sent-log.json; then
+            echo "No sent-log changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add email/sent-log.json
+          git commit -m "Email: record sent briefing"
+          git push
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
