@@ -207,7 +207,7 @@ def build_rss(items: list[tuple[str, str, str]], *, site_url: str) -> str:
     """
     channel_title = "RegLag — Daily Financial Regulatory Briefing"
     channel_desc = (
-        "RegLag is a daily briefing providing fast, source-based insights of financial regulatory and policy developments on weekdays, with weekend deep dives into enforcement, market structure, and regulatory mechanisms."
+        "RegLag is a financial regulatory briefing focused on source-based interpretation of regulatory, policy, and market-structure developments, with weekday coverage and weekend deep dives into enforcement and regulatory mechanisms."
     )
 
     now = format_datetime(datetime.now(timezone.utc))
@@ -452,17 +452,18 @@ HTML = """<!doctype html>
       font-size: 13px;
       color: var(--text-secondary);
     }}
-
-
-    .footer-copyright {{
+    .footer-meta {{
       margin-top: 12px;
       font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
       font-size: 12px;
       color: var(--text-secondary);
     }}
 
-    .footer-copyright-sub {{
+    .footer-meta-line {{
       margin-top: 4px;
+    }}
+
+    .footer-meta-muted {{
       font-size: 11px;
       color: var(--text-muted);
     }}
@@ -493,6 +494,8 @@ HTML = """<!doctype html>
 
 
     @media print {{
+      .footer-meta {{ display: none !important; }}
+
       /* Hide navigational chrome in PDFs */
       nav,
       .top-nav,
@@ -544,7 +547,7 @@ HTML = """<!doctype html>
         </a>
       </div>
       <div class="masthead-subtitle">Daily Financial Regulatory Briefing</div>
-      <div class="masthead-description">RegLag is a daily briefing providing fast, source-based insights of financial regulatory and policy developments on weekdays, with weekend deep dives into enforcement, market structure, and regulatory mechanisms.</div>
+      <div class="masthead-description">RegLag is a financial regulatory briefing focused on source-based interpretation of regulatory, policy, and market-structure developments, with weekday coverage and weekend deep dives into enforcement and regulatory mechanisms.</div>
       <hr />
       <nav class="top-nav">
         <a href="/">Latest</a> ·
@@ -567,18 +570,16 @@ HTML = """<!doctype html>
         <a href="/portfolio/index.html">Portfolio</a> ·
         <a href="/about/index.html">About</a> ·
         <a href="/subscribe/">Subscribe</a> ·
-        <a href="/legal/">Legal &amp; Privacy</a> ·
+        <a href="/legal/index.html">Legal &amp; Privacy</a> ·
         <a href="/rss.xml">RSS</a ·
         <a href="https://x.com/reglag_hq" rel="me noopener" target="_blank">X</a> ·
         <a href="mailto:contact@reglag.com">Contact</a>
       </nav>
-      <div class="footer-disclaimer">
-        Informational only. Not legal, financial, or compliance advice.
+      <div class="footer-meta">
+        <div class="footer-meta-line">Informational only. Not legal, financial, or compliance advice.</div>
+        <div class="footer-meta-line footer-meta-muted">© 2026 RegLag · Original analysis and commentary.</div>
       </div>
-      <div class="footer-copyright">
-        © 2026 RegLag
-        <div class="footer-copyright-sub">Original analysis and commentary.</div>
-      </div>
+</div>
     </footer>
   </div>
 </body>
@@ -723,13 +724,6 @@ def main() -> int:
     # Portfolio page
     if PORTFOLIO_SRC.exists():
         portfolio_html = md_to_html(PORTFOLIO_SRC.read_text(encoding="utf-8"))
-        portfolio_disclaimer = (
-            '<div class="portfolio-disclaimer">'
-            'This portfolio is illustrative and educational. It is not investment advice or a recommendation to buy, sell, or hold any security or strategy.'
-            '</div>'
-            '<div class="portfolio-disclaimer-sub">Past performance is shown for context only and does not predict future results.</div>'
-        )
-        portfolio_html = portfolio_disclaimer + portfolio_html
         portfolio_out = OUT / "portfolio"
         portfolio_out.mkdir(parents=True, exist_ok=True)
         (portfolio_out / "index.html").write_text(
