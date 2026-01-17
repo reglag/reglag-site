@@ -16,10 +16,10 @@ function listBriefingHtmlFiles() {
 
 function shortFooter() {
   return `
-    <div style="width:100%; box-sizing:border-box; padding-left:0.75in; padding-right:0.75in; font-family:'JetBrains Mono', ui-monospace, monospace; font-size:9px; color:#777;">
+    <div style="width:100%; box-sizing:border-box; margin:0; padding:0; font-family:'JetBrains Mono', ui-monospace, monospace; font-size:9px; color:#777; line-height:1.2;">
       <div style="width:100%; display:flex; justify-content:space-between; align-items:flex-end;">
         <div>© 2026 RegLag | reglag.com</div>
-        <div><span class="pageNumber"></span> / <span class="totalPages"></span></div>
+        <div>&nbsp;<span class="pageNumber"></span> / <span class="totalPages"></span></div>
       </div>
     </div>
   `;
@@ -27,12 +27,12 @@ function shortFooter() {
 
 function firstPageFooter() {
   return `
-    <div style="width:100%; box-sizing:border-box; padding-left:0.75in; padding-right:0.75in; font-family:'JetBrains Mono', ui-monospace, monospace; font-size:9px; color:#777;">
+    <div style="width:100%; box-sizing:border-box; margin:0; padding:0; font-family:'JetBrains Mono', ui-monospace, monospace; font-size:8px; color:#777; line-height:1.15;">
       <div style="margin-bottom:2px;">Original RegLag analysis and commentary. Informational only; not investment, legal, or regulatory advice.</div>
       <div style="margin-bottom:4px;">Free to share in full for non-commercial purposes with attribution to RegLag.</div>
       <div style="width:100%; display:flex; justify-content:space-between; align-items:flex-end;">
         <div>© 2026 RegLag | reglag.com</div>
-        <div><span class="pageNumber"></span> / <span class="totalPages"></span></div>
+        <div>&nbsp;<span class="pageNumber"></span> / <span class="totalPages"></span></div>
       </div>
     </div>
   `;
