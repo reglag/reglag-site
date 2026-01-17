@@ -10,12 +10,12 @@ The portfolio is not a recommendation, signal service, or allocation guide. It e
 
 ### Portfolio snapshot
 
-Marks are as of January 15, 2026.
+Marks are as of January 17, 2026.
 
-- **Weighted return since inception:** ≈ +1.34%
+- **Weighted return since inception:** ≈ +1.21%
 - **Inception date:** January 6, 2026
 - **Inception value:** $100.00
-- **Current value:** ≈ $101.34
+- **Current value:** ≈ $101.21
 
 ---
 
