@@ -20,6 +20,7 @@ ARCHIVE = OUT / "briefings"
 ABOUT_SRC = ROOT / "about" / "index.md"
 PORTFOLIO_SRC = ROOT / "portfolio" / "index.md"
 SUBSCRIBE_SRC = ROOT / "subscribe" / "index.md"
+LEGAL_SRC = ROOT / "legal" / "index.md"
 ASSETS_SRC = ROOT / "assets"
 ASSETS_OUT = OUT / "assets"
 
@@ -206,7 +207,7 @@ def build_rss(items: list[tuple[str, str, str]], *, site_url: str) -> str:
     """
     channel_title = "RegLag — Daily Financial Regulatory Briefing"
     channel_desc = (
-        "RegLag is a financial regulatory briefing focused on source-based interpretation of regulatory, policy, and market-structure developments, with weekday coverage and weekend deep dives into enforcement and regulatory mechanisms."
+        "RegLag is a daily briefing providing fast, source-based insights of financial regulatory and policy developments on weekdays, with weekend deep dives into enforcement, market structure, and regulatory mechanisms."
     )
 
     now = format_datetime(datetime.now(timezone.utc))
@@ -380,6 +381,21 @@ HTML = """<!doctype html>
     }}
 
     /* Key: post type should look like a subheading, not a headline */
+
+    .portfolio-disclaimer {{
+      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 6px 0 8px;
+    }}
+
+    .portfolio-disclaimer-sub {{
+      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin: 0 0 18px;
+    }}
+
     .post-type {{
       font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
       font-size: 14px;
@@ -437,6 +453,20 @@ HTML = """<!doctype html>
       color: var(--text-secondary);
     }}
 
+
+    .footer-copyright {{
+      margin-top: 12px;
+      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }}
+
+    .footer-copyright-sub {{
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }}
+
     .footer-disclaimer {{
       margin-top: 12px;
       font-size: 12px;
@@ -487,16 +517,7 @@ HTML = """<!doctype html>
       }}
 
       /* Print-only disclaimer (single source of truth) */
-      body::after {{
-        content: "RegLag — Informational only. Not legal, financial, or compliance advice.";
-        display: block;
-        margin-top: 24px;
-        font-size: 10px;
-        color: #777;
-        border-top: 1px solid #e5e5e5;
-        padding-top: 8px;
       }}
-    }}
 
     @media (max-width: 520px) {{
       body {{ font-size: 16px; line-height: 1.68; }}
@@ -523,7 +544,7 @@ HTML = """<!doctype html>
         </a>
       </div>
       <div class="masthead-subtitle">Daily Financial Regulatory Briefing</div>
-      <div class="masthead-description">RegLag is a financial regulatory briefing focused on source-based interpretation of regulatory, policy, and market-structure developments, with weekday coverage and weekend deep dives into enforcement and regulatory mechanisms.</div>
+      <div class="masthead-description">RegLag is a daily briefing providing fast, source-based insights of financial regulatory and policy developments on weekdays, with weekend deep dives into enforcement, market structure, and regulatory mechanisms.</div>
       <hr />
       <nav class="top-nav">
         <a href="/">Latest</a> ·
@@ -546,12 +567,17 @@ HTML = """<!doctype html>
         <a href="/portfolio/index.html">Portfolio</a> ·
         <a href="/about/index.html">About</a> ·
         <a href="/subscribe/">Subscribe</a> ·
-        <a href="/rss.xml">RSS</a> ·
+        <a href="/legal/">Legal &amp; Privacy</a> ·
+        <a href="/rss.xml">RSS</a ·
         <a href="https://x.com/reglag_hq" rel="me noopener" target="_blank">X</a> ·
         <a href="mailto:contact@reglag.com">Contact</a>
       </nav>
       <div class="footer-disclaimer">
         Informational only. Not legal, financial, or compliance advice.
+      </div>
+      <div class="footer-copyright">
+        © 2026 RegLag
+        <div class="footer-copyright-sub">Original analysis and commentary.</div>
       </div>
     </footer>
   </div>
@@ -697,6 +723,13 @@ def main() -> int:
     # Portfolio page
     if PORTFOLIO_SRC.exists():
         portfolio_html = md_to_html(PORTFOLIO_SRC.read_text(encoding="utf-8"))
+        portfolio_disclaimer = (
+            \'<div class="portfolio-disclaimer">\'
+            \'This portfolio is illustrative and educational. It is not investment advice or a recommendation to buy, sell, or hold any security or strategy.\'
+            \'</div>\'
+            \'<div class="portfolio-disclaimer-sub">Past performance is shown for context only and does not predict future results.</div>\'
+        )
+        portfolio_html = portfolio_disclaimer + portfolio_html
         portfolio_out = OUT / "portfolio"
         portfolio_out.mkdir(parents=True, exist_ok=True)
         (portfolio_out / "index.html").write_text(
@@ -712,6 +745,16 @@ def main() -> int:
         subscribe_out.mkdir(parents=True, exist_ok=True)
         (subscribe_out / "index.html").write_text(
             HTML.format(title="Subscribe", body=subscribe_html, canonical_url=f"{SITE_URL}/subscribe/"),
+            encoding="utf-8",
+        )
+
+    # Legal & Privacy page
+    if LEGAL_SRC.exists():
+        legal_html = md_to_html(LEGAL_SRC.read_text(encoding="utf-8"))
+        legal_out = OUT / "legal"
+        legal_out.mkdir(parents=True, exist_ok=True)
+        (legal_out / "index.html").write_text(
+            HTML.format(title="Legal & Privacy", body=legal_html, canonical_url=f"{SITE_URL}/legal/"),
             encoding="utf-8",
         )
 
