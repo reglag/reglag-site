@@ -724,10 +724,10 @@ def main() -> int:
     if PORTFOLIO_SRC.exists():
         portfolio_html = md_to_html(PORTFOLIO_SRC.read_text(encoding="utf-8"))
         portfolio_disclaimer = (
-            \'<div class="portfolio-disclaimer">\'
-            \'This portfolio is illustrative and educational. It is not investment advice or a recommendation to buy, sell, or hold any security or strategy.\'
-            \'</div>\'
-            \'<div class="portfolio-disclaimer-sub">Past performance is shown for context only and does not predict future results.</div>\'
+            '<div class="portfolio-disclaimer">'
+            'This portfolio is illustrative and educational. It is not investment advice or a recommendation to buy, sell, or hold any security or strategy.'
+            '</div>'
+            '<div class="portfolio-disclaimer-sub">Past performance is shown for context only and does not predict future results.</div>'
         )
         portfolio_html = portfolio_disclaimer + portfolio_html
         portfolio_out = OUT / "portfolio"
