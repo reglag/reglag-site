@@ -2,7 +2,7 @@ name: Build & Deploy RegLag
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -21,15 +21,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install markdown
@@ -37,6 +34,26 @@ jobs:
       - name: Build site
         run: |
           python scripts/build.py
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright + pdf-lib
+        run: |
+          npm init -y
+          npm i -D playwright pdf-lib
+          npx playwright install --with-deps chromium
+
+      - name: Serve site locally
+        run: |
+          python3 -m http.server 8000 --directory publish/site &
+          sleep 1
+
+      - name: Render PDFs
+        run: |
+          node scripts/render_pdfs.mjs
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
