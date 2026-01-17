@@ -6,6 +6,8 @@ The RegLag Model Portfolio (“26 for 2026”) is an illustrative, multi-asset p
 
 The portfolio is not a recommendation, signal service, or allocation guide. It exists to provide context for how regulatory, macroeconomic, and market-structure developments can be translated into a coherent positioning framework over time.
 
+Any performance figures shown are for context only and do not predict future results.
+
 ---
 
 ### Portfolio snapshot
