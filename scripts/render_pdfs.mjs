@@ -16,8 +16,12 @@ function listBriefingHtmlFiles() {
 
 function shortFooter() {
   return `
-    <div style="width:100%; box-sizing:border-box; padding-left:0.75in; padding-right:0.75in; font-family:'JetBrains Mono', ui-monospace, monospace; font-size:9px; color:#777; line-height:1.2;">
-      <div style="display:flex; justify-content:space-between; align-items:flex-end; width:100%;">
+    <style>
+      html, body { margin: 0; padding: 0; }
+    </style>
+    <div style="width:100%; box-sizing:border-box; padding-left:0.75in; padding-right:0.75in;
+                font-family:'JetBrains Mono', ui-monospace, monospace; font-size:9px; color:#777; line-height:1.15;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; width:100%; white-space:nowrap;">
         <div>© 2026 RegLag | reglag.com</div>
         <div><span class="pageNumber"></span> / <span class="totalPages"></span></div>
       </div>
@@ -27,10 +31,14 @@ function shortFooter() {
 
 function firstPageFooter() {
   return `
-    <div style="width:100%; box-sizing:border-box; padding-left:0.75in; padding-right:0.75in; font-family:'JetBrains Mono', ui-monospace, monospace; font-size:8px; color:#777; line-height:1.25;">
-      <div style="margin-bottom:2px;">Original RegLag analysis and commentary. Informational only; not investment, legal, or regulatory advice.</div>
-      <div style="margin-bottom:4px;">Free to share in full for non-commercial purposes with attribution to RegLag.</div>
-      <div style="display:flex; justify-content:space-between; align-items:flex-end; width:100%;">
+    <style>
+      html, body { margin: 0; padding: 0; }
+    </style>
+    <div style="width:100%; box-sizing:border-box; padding-left:0.75in; padding-right:0.75in;
+                font-family:'JetBrains Mono', ui-monospace, monospace; font-size:7.5px; color:#777; line-height:1.12;">
+      <div style="margin:0 0 2px 0;">Original RegLag analysis and commentary. Informational only; not investment, legal, or regulatory advice.</div>
+      <div style="margin:0 0 4px 0;">Free to share in full for non-commercial purposes with attribution to RegLag.</div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; width:100%; white-space:nowrap;">
         <div>© 2026 RegLag | reglag.com</div>
         <div><span class="pageNumber"></span> / <span class="totalPages"></span></div>
       </div>
@@ -96,7 +104,7 @@ async function main() {
     const fullShort = await page.pdf({
       format: "Letter",
       printBackground: true,
-      margin: { top: "0.75in", right: "0.75in", bottom: "1.35in", left: "0.75in" },
+      margin: { top: "0.75in", right: "0.75in", bottom: "1.75in", left: "0.75in" },
       displayHeaderFooter: true,
       headerTemplate: `<div></div>`,
       footerTemplate: shortFooter(),
@@ -109,7 +117,7 @@ async function main() {
     const page1Long = await page.pdf({
       format: "Letter",
       printBackground: true,
-      margin: { top: "0.75in", right: "0.75in", bottom: "1.35in", left: "0.75in" },
+      margin: { top: "0.75in", right: "0.75in", bottom: "1.75in", left: "0.75in" },
       displayHeaderFooter: true,
       headerTemplate: `<div></div>`,
       footerTemplate: firstPageFooter(),
