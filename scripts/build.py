@@ -735,7 +735,7 @@ def main() -> int:
         display_date = format_spelled_date(dt)
         pdf_path = ARCHIVE / f"{date_str}.pdf"
         pdf_link = " (PDF)" if pdf_path.exists() else ""
-        archive_html += f'<p>{display_date} — <a href="/briefings/{date_str}.html">{xml_escape(title)}</a>{pdf_link}</p>'
+        archive_html += f'<p>{display_date} — <a href="/briefings/{date_str}.html"><em>{xml_escape(title)}</em></a>{pdf_link}</p>'
 
     # Daily Briefings
     archive_html += '<h2 id="daily-briefings">Daily Briefings</h2>'
@@ -750,7 +750,7 @@ def main() -> int:
             current_month = month_label
 
         display_date = format_spelled_date(dt)
-        archive_html += f'<p>{display_date} — <a href="/briefings/{date_str}.html">{xml_escape(title)}</a></p>'
+        archive_html += f'<p>{display_date} — <a href="/briefings/{date_str}.html"><em>{xml_escape(title)}</em></a></p>'
 
     (ARCHIVE / "index.html").write_text(
         HTML.format(
