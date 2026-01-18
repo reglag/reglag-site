@@ -6,13 +6,15 @@ const FROM = process.env.REGLAG_FROM_EMAIL;
 const REPLY_TO = process.env.REGLAG_REPLY_TO;
 const ENABLED = (process.env.EMAIL_SEND_ENABLED || "false").toLowerCase() === "true";
 
+const SITE_URL = "https://reglag.com";
+
 const SITE_DIR = path.resolve("publish/site");
 const BRIEFINGS_DIR = path.join(SITE_DIR, "briefings");
 
 const SUBSCRIBERS_CSV = path.resolve("subscribers.csv");
 const SENT_LOG_PATH = path.resolve("email/sent-log.json");
 
-// Postmark Broadcast stream id is typically "broadcast"
+// Postmark message stream for compliant unsubscribe handling
 const MESSAGE_STREAM = "broadcast";
 
 function spelledDate(yyyy_mm_dd) {
@@ -37,11 +39,12 @@ function saveSentLog(log) {
 
 function parseSubscribers() {
   const csv = readFile(SUBSCRIBERS_CSV).trim().split("\n");
-  const header = csv.shift();
+  csv.shift(); // header
   const rows = [];
   for (const line of csv) {
     if (!line.trim()) continue;
-    const [email, name, status] = line.split(",").map((s) => s.trim());
+    // naive CSV parse (matches our simple format)
+    const [email, name, status] = line.split(",").map((s) => (s || "").trim());
     if (!email) continue;
     rows.push({ email: email.toLowerCase(), name: name || "", status: status || "" });
   }
@@ -54,7 +57,6 @@ function extractMainHtml(fullHtml) {
 }
 
 function detectPostType(fullHtml) {
-  // Your pages include <h3 class="post-type">Weekend Deep Dive</h3> or Daily Briefing
   const m = fullHtml.match(/class="post-type"[^>]*>\s*([^<]+)\s*</i);
   return m ? m[1].trim() : "Daily Briefing";
 }
@@ -66,11 +68,28 @@ function subjectFor(postType, spelled) {
   return `RegLag — Daily Financial Regulatory Briefing — ${spelled}`;
 }
 
+/**
+ * Email hygiene transforms:
+ * - remove the PDF download link block (pdf-link) from email
+ * - make all root-relative links absolute (href="/x" -> "https://reglag.com/x")
+ */
+function normalizeEmailHtml(html) {
+  // Remove pdf-link paragraphs
+  html = html.replace(/<p[^>]*class="pdf-link"[^>]*>[\s\S]*?<\/p>/gi, "");
+
+  // Make href/src absolute for root-relative URLs
+  html = html.replace(/\s(href|src)=["']\/(?!\/)([^"']+)["']/gi, (match, attr, rest) => {
+    return ` ${attr}="${SITE_URL}/${rest}"`;
+  });
+
+  return html;
+}
+
 async function postmarkSend(toEmail, subject, htmlBody) {
   const res = await fetch("https://api.postmarkapp.com/email", {
     method: "POST",
     headers: {
-      "Accept": "application/json",
+      Accept: "application/json",
       "Content-Type": "application/json",
       "X-Postmark-Server-Token": TOKEN,
     },
@@ -97,8 +116,12 @@ async function main() {
   }
   if (!TOKEN || !FROM || !REPLY_TO) throw new Error("Missing required env vars/secrets.");
 
-  // Determine “today’s briefing” as newest HTML file in publish/site/briefings/
-  const htmlFiles = fs.readdirSync(BRIEFINGS_DIR).filter(f => /^\d{4}-\d{2}-\d{2}\.html$/.test(f)).sort().reverse();
+  const htmlFiles = fs
+    .readdirSync(BRIEFINGS_DIR)
+    .filter((f) => /^\d{4}-\d{2}-\d{2}\.html$/.test(f))
+    .sort()
+    .reverse();
+
   if (htmlFiles.length === 0) throw new Error("No briefing HTML files found.");
 
   const latestHtml = htmlFiles[0];
@@ -115,9 +138,27 @@ async function main() {
   const spelled = spelledDate(dateStr);
   const subject = subjectFor(postType, spelled);
 
-  // Email body: main content only; wrapped in a simple, email-safe container
-  const mainHtml = extractMainHtml(fullHtml);
+  const mainHtmlRaw = extractMainHtml(fullHtml);
+  const mainHtml = normalizeEmailHtml(mainHtmlRaw);
+
+  // Email-safe typography overrides (tighten H1 + spacing)
+  const emailCss = `
+    <style>
+      /* Basic reset */
+      body { margin: 0; padding: 0; }
+      h1 { font-size: 22px; line-height: 1.25; margin: 0 0 12px 0; }
+      h2 { font-size: 16px; line-height: 1.25; margin: 20px 0 8px 0; }
+      h3 { font-size: 14px; line-height: 1.25; margin: 16px 0 6px 0; }
+      p { margin: 0 0 10px 0; }
+      ul, ol { margin: 0 0 10px 18px; padding: 0; }
+      li { margin: 0 0 6px 0; }
+      a { color: inherit; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+    </style>
+  `;
+
   const emailHtml = `
+    ${emailCss}
     <div style="max-width:820px;margin:0 auto;padding:16px 18px;font-family:Georgia,serif;font-size:16px;line-height:1.6;color:#111;">
       ${mainHtml}
     </div>
@@ -126,14 +167,12 @@ async function main() {
   const recipients = parseSubscribers();
   if (recipients.length === 0) throw new Error("No active subscribers in subscribers.csv.");
 
-  // Send one-by-one (simple + transparent). You can batch later if needed.
   console.log(`Sending ${dateStr} to ${recipients.length} recipients via Postmark broadcast stream...`);
 
   for (const r of recipients) {
     await postmarkSend(r.email, subject, emailHtml);
   }
 
-  // Mark sent (idempotency)
   sentLog[dateStr] = { sent_at: new Date().toISOString(), count: recipients.length };
   saveSentLog(sentLog);
   console.log(`Sent + logged ${dateStr}.`);
