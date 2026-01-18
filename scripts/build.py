@@ -55,6 +55,11 @@ def format_spelled_date(dt: datetime) -> str:
     return dt.strftime("%B %d, %Y").replace(" 0", " ")
 
 
+def format_archive_date(dt: datetime) -> str:
+    # Archive-only abbreviated month for tighter mobile layout.
+    return dt.strftime(\"%b %d, %Y\").replace(\" 0\", \" \")
+
+
 # -----------------------------
 # Post type extraction (SOURCE OF TRUTH = first H2)
 # -----------------------------
@@ -744,7 +749,7 @@ def main() -> int:
 
     for date_str, title in deep_dives:
         dt = datetime.strptime(date_str, "%Y-%m-%d")
-        display_date = format_spelled_date(dt)
+        display_date = format_archive_date(dt)
         # PDFs are generated later in the pipeline; link deterministically.
         pdf_suffix = f' (<a class="archive-pdf" href="/briefings/{date_str}.pdf">PDF</a>)'
         archive_html += (
@@ -766,7 +771,7 @@ def main() -> int:
             archive_html += f"<h3>{month_label}</h3>"
             current_month = month_label
 
-        display_date = format_spelled_date(dt)
+        display_date = format_archive_date(dt)
         archive_html += (
             '<div class="archive-entry">'
             f'<span class="archive-date">{xml_escape(display_date)} —</span>'
