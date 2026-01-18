@@ -546,6 +546,29 @@ HTML = """<!doctype html>
       /* Print-only disclaimer (single source of truth) */
       }}
 
+
+    /* Archive density + hierarchy (archive page only) */
+    .archive-list p {{
+      margin-bottom: 6px;
+    }}
+
+    .archive-list h2 {{
+      font-size: 18px;
+      margin-top: 28px;
+      margin-bottom: 10px;
+    }}
+
+    .archive-list h3 {{
+      font-size: 14px;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }}
+
+    .archive-pdf {{
+      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+      font-size: 12px;
+    }}
+
     @media (max-width: 520px) {{
       body {{ font-size: 16px; line-height: 1.68; }}
       h1 {{ font-size: 22px; }}
@@ -713,8 +736,7 @@ def main() -> int:
     )
     (OUT / "index.html").write_text(home_html, encoding="utf-8")
 
-    
-    # Archive index (reorganized by type, then date)
+    # Archive index (reorganized by type, then date; tightened spacing)
     deep_dives = []
     dailies = []
 
@@ -724,7 +746,8 @@ def main() -> int:
         else:
             dailies.append((date_str, title))
 
-    archive_html = "<h1>Briefing Archive</h1>"
+    archive_html = '<div class="archive-list">'
+    archive_html += "<h1>Briefing Archive</h1>"
     archive_html += '<p><a href="#weekend-deep-dives">Weekend Deep Dives</a> · <a href="#daily-briefings">Daily Briefings</a></p>'
 
     # Weekend Deep Dives
@@ -734,8 +757,12 @@ def main() -> int:
         dt = datetime.strptime(date_str, "%Y-%m-%d")
         display_date = format_spelled_date(dt)
         pdf_path = ARCHIVE / f"{date_str}.pdf"
-        pdf_link = " (PDF)" if pdf_path.exists() else ""
-        archive_html += f'<p>{display_date} — <a href="/briefings/{date_str}.html"><em>{xml_escape(title)}</em></a>{pdf_link}</p>'
+        pdf_suffix = f' (<a class="archive-pdf" href="/briefings/{date_str}.pdf">PDF</a>)' if pdf_path.exists() else ""
+        archive_html += (
+            f'<p>{display_date} — '
+            f'<a href="/briefings/{date_str}.html"><em>{xml_escape(title)}</em></a>'
+            f'{pdf_suffix}</p>'
+        )
 
     # Daily Briefings
     archive_html += '<h2 id="daily-briefings">Daily Briefings</h2>'
@@ -750,16 +777,19 @@ def main() -> int:
             current_month = month_label
 
         display_date = format_spelled_date(dt)
-        archive_html += f'<p>{display_date} — <a href="/briefings/{date_str}.html"><em>{xml_escape(title)}</em></a></p>'
+        archive_html += (
+            f'<p>{display_date} — '
+            f'<a href="/briefings/{date_str}.html"><em>{xml_escape(title)}</em></a>'
+            f'</p>'
+        )
+
+    archive_html += "</div>"
 
     (ARCHIVE / "index.html").write_text(
-        HTML.format(
-            title="Briefing Archive",
-            body=archive_html,
-            canonical_url=f"{SITE_URL}/briefings/",
-        ),
+        HTML.format(title="Briefing Archive", body=archive_html, canonical_url=f"{SITE_URL}/briefings/"),
         encoding="utf-8",
     )
+
 
     # About page
     if ABOUT_SRC.exists():
