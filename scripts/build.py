@@ -20,7 +20,6 @@ ARCHIVE = OUT / "briefings"
 ABOUT_SRC = ROOT / "about" / "index.md"
 PORTFOLIO_SRC = ROOT / "portfolio" / "index.md"
 SUBSCRIBE_SRC = ROOT / "subscribe" / "index.md"
-LEGAL_SRC = ROOT / "legal" / "index.md"
 ASSETS_SRC = ROOT / "assets"
 ASSETS_OUT = OUT / "assets"
 
@@ -53,11 +52,6 @@ def extract_title(md_text: str) -> str:
 def format_spelled_date(dt: datetime) -> str:
     # Cross-platform “January 6, 2026” (no leading zero).
     return dt.strftime("%B %d, %Y").replace(" 0", " ")
-
-
-def format_archive_date(dt: datetime) -> str:
-    # Archive-only abbreviated month for tighter mobile layout.
-    return dt.strftime(\"%b %d, %Y\").replace(\" 0\", \" \")
 
 
 # -----------------------------
@@ -386,21 +380,6 @@ HTML = """<!doctype html>
     }}
 
     /* Key: post type should look like a subheading, not a headline */
-
-    .portfolio-disclaimer {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin: 6px 0 8px;
-    }}
-
-    .portfolio-disclaimer-sub {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 12px;
-      color: var(--text-muted);
-      margin: 0 0 18px;
-    }}
-
     .post-type {{
       font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
       font-size: 14px;
@@ -457,21 +436,6 @@ HTML = """<!doctype html>
       font-size: 13px;
       color: var(--text-secondary);
     }}
-    .footer-meta {{
-      margin-top: 12px;
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 12px;
-      color: var(--text-secondary);
-    }}
-
-    .footer-meta-line {{
-      margin-top: 4px;
-    }}
-
-    .footer-meta-muted {{
-      font-size: 11px;
-      color: var(--text-muted);
-    }}
 
     .footer-disclaimer {{
       margin-top: 12px;
@@ -499,8 +463,6 @@ HTML = """<!doctype html>
 
 
     @media print {{
-      .footer-meta {{ display: none !important; }}
-
       /* Hide navigational chrome in PDFs */
       nav,
       .top-nav,
@@ -525,42 +487,15 @@ HTML = """<!doctype html>
       }}
 
       /* Print-only disclaimer (single source of truth) */
+      body::after {{
+        content: "RegLag — Informational only. Not legal, financial, or compliance advice.";
+        display: block;
+        margin-top: 24px;
+        font-size: 10px;
+        color: #777;
+        border-top: 1px solid #e5e5e5;
+        padding-top: 8px;
       }}
-
-
-    /* Archive density + hierarchy (archive page only) */
-    .archive-list .archive-entry {{
-      display: grid;
-      grid-template-columns: max-content 1fr;
-      column-gap: 8px;
-      align-items: baseline;
-      margin: 0 0 6px 0;
-    }}
-
-    .archive-list .archive-date {{
-      white-space: nowrap;
-      color: var(--text-secondary);
-    }}
-
-    .archive-list .archive-title {{
-      min-width: 0; /* allow wrapping */
-    }}
-
-    .archive-list h2 {{
-      font-size: 18px;
-      margin-top: 28px;
-      margin-bottom: 10px;
-    }}
-
-    .archive-list h3 {{
-      font-size: 14px;
-      margin-top: 18px;
-      margin-bottom: 8px;
-    }}
-
-    .archive-pdf {{
-      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-      font-size: 12px;
     }}
 
     @media (max-width: 520px) {{
@@ -611,16 +546,13 @@ HTML = """<!doctype html>
         <a href="/portfolio/index.html">Portfolio</a> ·
         <a href="/about/index.html">About</a> ·
         <a href="/subscribe/">Subscribe</a> ·
-        <a href="/legal/index.html">Legal &amp; Privacy</a> ·
         <a href="/rss.xml">RSS</a> ·
         <a href="https://x.com/reglag_hq" rel="me noopener" target="_blank">X</a> ·
         <a href="mailto:contact@reglag.com">Contact</a>
       </nav>
-      <div class="footer-meta">
-        <div class="footer-meta-line">Informational only. Not legal, financial, or compliance advice.</div>
-        <div class="footer-meta-line footer-meta-muted">© 2026 RegLag · Original analysis and commentary.</div>
+      <div class="footer-disclaimer">
+        Informational only. Not legal, financial, or compliance advice.
       </div>
-</div>
     </footer>
   </div>
 </body>
@@ -730,40 +662,11 @@ def main() -> int:
     )
     (OUT / "index.html").write_text(home_html, encoding="utf-8")
 
-    # Archive index (reorganized by type, then date; tightened spacing)
-    deep_dives = []
-    dailies = []
+    # Archive index (clickable + labeled)
+    archive_html = "<h1>Briefing Archive</h1>"
+    current_month = None
 
     for date_str, post_type, title in archive_items:
-        if post_type == "Weekend Deep Dive":
-            deep_dives.append((date_str, title))
-        else:
-            dailies.append((date_str, title))
-
-    archive_html = '<div class="archive-list">'
-    archive_html += "<h1>Briefing Archive</h1>"
-    archive_html += '<p><a href="#weekend-deep-dives">Weekend Deep Dives</a> · <a href="#daily-briefings">Daily Briefings</a></p>'
-
-    # Weekend Deep Dives
-    archive_html += '<h2 id="weekend-deep-dives">Weekend Deep Dives</h2>'
-
-    for date_str, title in deep_dives:
-        dt = datetime.strptime(date_str, "%Y-%m-%d")
-        display_date = format_archive_date(dt)
-        # PDFs are generated later in the pipeline; link deterministically.
-        pdf_suffix = f' (<a class="archive-pdf" href="/briefings/{date_str}.pdf">PDF</a>)'
-        archive_html += (
-            '<div class="archive-entry">'
-            f'<span class="archive-date">{xml_escape(display_date)} —</span>'
-            f'<span class="archive-title"><a href="/briefings/{date_str}.html"><em>{xml_escape(title)}</em></a>{pdf_suffix}</span>'
-            '</div>'
-        )
-
-    # Daily Briefings
-    archive_html += '<h2 id="daily-briefings">Daily Briefings</h2>'
-
-    current_month = None
-    for date_str, title in dailies:
         dt = datetime.strptime(date_str, "%Y-%m-%d")
         month_label = dt.strftime("%B %Y")
 
@@ -771,21 +674,15 @@ def main() -> int:
             archive_html += f"<h3>{month_label}</h3>"
             current_month = month_label
 
-        display_date = format_archive_date(dt)
-        archive_html += (
-            '<div class="archive-entry">'
-            f'<span class="archive-date">{xml_escape(display_date)} —</span>'
-            f'<span class="archive-title"><a href="/briefings/{date_str}.html"><em>{xml_escape(title)}</em></a></span>'
-            '</div>'
-        )
-
-    archive_html += "</div>"
+        prefix = f"{format_spelled_date(dt)} — {post_type} — "
+        display_html = f'{xml_escape(prefix)}<em>{xml_escape(title)}</em>'
+        url = f"/briefings/{date_str}.html"
+        archive_html += f'<p><a href="{url}">{display_html}</a></p>'
 
     (ARCHIVE / "index.html").write_text(
         HTML.format(title="Briefing Archive", body=archive_html, canonical_url=f"{SITE_URL}/briefings/"),
         encoding="utf-8",
     )
-
 
     # About page
     if ABOUT_SRC.exists():
@@ -815,16 +712,6 @@ def main() -> int:
         subscribe_out.mkdir(parents=True, exist_ok=True)
         (subscribe_out / "index.html").write_text(
             HTML.format(title="Subscribe", body=subscribe_html, canonical_url=f"{SITE_URL}/subscribe/"),
-            encoding="utf-8",
-        )
-
-    # Legal & Privacy page
-    if LEGAL_SRC.exists():
-        legal_html = md_to_html(LEGAL_SRC.read_text(encoding="utf-8"))
-        legal_out = OUT / "legal"
-        legal_out.mkdir(parents=True, exist_ok=True)
-        (legal_out / "index.html").write_text(
-            HTML.format(title="Legal & Privacy", body=legal_html, canonical_url=f"{SITE_URL}/legal/"),
             encoding="utf-8",
         )
 
