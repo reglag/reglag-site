@@ -494,30 +494,6 @@ HTML = """<!doctype html>
 
 
     @media print {{
-
-      /* Align PDF body column to physical page margins (not centered web layout) */
-      .wrap {{
-        max-width: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }}
-
-      /* Keep headings with first content block to avoid orphan headings */
-      h2, h3 {{
-        break-after: avoid-page;
-        page-break-after: avoid;
-        break-inside: avoid;
-        page-break-inside: avoid;
-      }}
-
-      h2 + p, h3 + p,
-      h2 + ul, h3 + ul,
-      h2 + ol, h3 + ol {{
-        break-inside: avoid;
-        page-break-inside: avoid;
-      }}
-
-
       .footer-meta {{ display: none !important; }}
 
       /* Hide navigational chrome in PDFs */
@@ -548,8 +524,21 @@ HTML = """<!doctype html>
 
 
     /* Archive density + hierarchy (archive page only) */
-    .archive-list p {{
-      margin-bottom: 6px;
+    .archive-list .archive-entry {{
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      column-gap: 8px;
+      align-items: baseline;
+      margin: 0 0 6px 0;
+    }}
+
+    .archive-list .archive-date {{
+      white-space: nowrap;
+      color: var(--text-secondary);
+    }}
+
+    .archive-list .archive-title {{
+      min-width: 0; /* allow wrapping */
     }}
 
     .archive-list h2 {{
@@ -756,12 +745,13 @@ def main() -> int:
     for date_str, title in deep_dives:
         dt = datetime.strptime(date_str, "%Y-%m-%d")
         display_date = format_spelled_date(dt)
-        pdf_path = ARCHIVE / f"{date_str}.pdf"
-        pdf_suffix = f' (<a class="archive-pdf" href="/briefings/{date_str}.pdf">PDF</a>)' if pdf_path.exists() else ""
+        # PDFs are generated later in the pipeline; link deterministically.
+        pdf_suffix = f' (<a class="archive-pdf" href="/briefings/{date_str}.pdf">PDF</a>)'
         archive_html += (
-            f'<p>{display_date} — '
-            f'<a href="/briefings/{date_str}.html"><em>{xml_escape(title)}</em></a>'
-            f'{pdf_suffix}</p>'
+            '<div class="archive-entry">'
+            f'<span class="archive-date">{xml_escape(display_date)} —</span>'
+            f'<span class="archive-title"><a href="/briefings/{date_str}.html"><em>{xml_escape(title)}</em></a>{pdf_suffix}</span>'
+            '</div>'
         )
 
     # Daily Briefings
@@ -778,9 +768,10 @@ def main() -> int:
 
         display_date = format_spelled_date(dt)
         archive_html += (
-            f'<p>{display_date} — '
-            f'<a href="/briefings/{date_str}.html"><em>{xml_escape(title)}</em></a>'
-            f'</p>'
+            '<div class="archive-entry">'
+            f'<span class="archive-date">{xml_escape(display_date)} —</span>'
+            f'<span class="archive-title"><a href="/briefings/{date_str}.html"><em>{xml_escape(title)}</em></a></span>'
+            '</div>'
         )
 
     archive_html += "</div>"
