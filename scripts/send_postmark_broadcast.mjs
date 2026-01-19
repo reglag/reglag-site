@@ -146,7 +146,7 @@ async function main() {
     <style>
       /* Basic reset */
       body { margin: 0; padding: 0; }
-      h1 { font-size: 22px; line-height: 1.25; margin: 0 0 12px 0; }
+      h1 { font-size: 18px; line-height: 1.22; margin: 0 0 10px 0; font-weight: 600}
       h2 { font-size: 16px; line-height: 1.25; margin: 20px 0 8px 0; }
       h3 { font-size: 14px; line-height: 1.25; margin: 16px 0 6px 0; }
       p { margin: 0 0 10px 0; }
