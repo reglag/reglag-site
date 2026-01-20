@@ -266,11 +266,11 @@ HTML = """<!doctype html>
 
   <!-- Open Graph -->
   <meta property="og:description" content="RegLag is a financial regulatory briefing focused on source-based interpretation of regulatory, policy, and market-structure developments, with weekday coverage and weekend deep dives into enforcement and regulatory mechanisms." />
-  <meta property="og:image" content="https://reglag.com/assets/logo/reglag-mark-512-tight.png" />
+  <meta property="og:image" content="https://reglag.com/assets/logo/reglag-mark-512.png" />
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:image" content="https://reglag.com/assets/logo/reglag-mark-512-tight.png" />
+  <meta name="twitter:image" content="https://reglag.com/assets/logo/reglag-mark-512.png" />
 
   <!-- Structured data (Organization) -->
   <script type="application/ld+json">
