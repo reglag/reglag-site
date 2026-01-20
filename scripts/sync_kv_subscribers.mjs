@@ -17,6 +17,19 @@ function csvEscape(s) {
   return v;
 }
 
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isPlaceholderEmail(email) {
+  return (
+    email.endsWith("@example.com") ||
+    email.endsWith("@example.org") ||
+    email.endsWith("@example.net") ||
+    email === "you@example.com"
+  );
+}
+
 async function cfFetch(url) {
   const res = await fetch(url, {
     headers: {
@@ -88,7 +101,6 @@ async function postmarkGet(url) {
 async function getPostmarkSuppressedEmails() {
   const suppressed = new Set();
 
-  // Try dump endpoint first, fall back to paging if unavailable.
   const dumpUrls = [
     `https://api.postmarkapp.com/message-streams/${POSTMARK_STREAM}/suppressions/dump`,
     `https://api.postmarkapp.com/message-streams/${POSTMARK_STREAM}/suppressions/dump?format=json`,
@@ -105,9 +117,7 @@ async function getPostmarkSuppressedEmails() {
         }
         return suppressed;
       }
-    } catch {
-      // ignore and fall back
-    }
+    } catch {}
   }
 
   let offset = 0;
@@ -149,10 +159,16 @@ async function main() {
   const kvRows = [];
   for (const key of keys) {
     const email = key.slice(4).toLowerCase();
+
+    if (!isValidEmail(email) || isPlaceholderEmail(email)) {
+      console.log(`Skipping placeholder/invalid KV email: ${email}`);
+      continue;
+    }
+
     const rec = await getKvJson(key);
     const subscribed_at = isoDate(rec?.subscribed_at) || isoDate(rec?.last_seen_at) || "";
     const status = (rec?.status || "active").toLowerCase();
-    if (email) kvRows.push({ email, subscribed_at, status });
+    kvRows.push({ email, subscribed_at, status });
   }
 
   const suppressed = await getPostmarkSuppressedEmails();
