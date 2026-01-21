@@ -12,7 +12,7 @@ Any performance figures shown are for context only and do not predict future res
 
 ### Portfolio snapshot
 
-Marks are as of January 17, 2026.
+Marks are as of January 20, 2026.
 
 - **Weighted return since inception:** ≈ +0.44%
 - **Inception date:** January 6, 2026
