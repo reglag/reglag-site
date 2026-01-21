@@ -146,7 +146,19 @@ async function main() {
     <style>
       /* Basic reset */
       body { margin: 0; padding: 0; }
-      h1 { font-size: 16px; !important; line-height: 1.2; !important; margin: 0 0 8px 0; !important; font-weight: 600; letter-spacing: 0;}
+      h1 {
+      font-size: 15px !important;
+      line-height: 1.18 !important;
+      margin: 0 0 8px 0 !important;
+      font-weight: 600 !important;
+      letter-spacing: -0.01em !important;
+      font-family: Georgia, serif !important;
+    }
+
+    h1 * {
+      font-size: inherit !important;
+      line-height: inherit !important;
+    }
       h2 { font-size: 16px; line-height: 1.25; margin: 20px 0 8px 0; }
       h3 { font-size: 14px; line-height: 1.25; margin: 16px 0 6px 0; }
       p { margin: 0 0 10px 0; }
