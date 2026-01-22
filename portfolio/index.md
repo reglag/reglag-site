@@ -12,12 +12,12 @@ Any performance figures shown are for context only and do not predict future res
 
 ### Portfolio snapshot
 
-Marks are as of January 20, 2026.
+Marks are as of January 21, 2026.
 
-- **Weighted return since inception:** ≈ +0.44%
+- **Weighted return since inception:** ≈ +1.32%
 - **Inception date:** January 6, 2026
 - **Inception value:** $100.00
-- **Current value:** ≈ $100.44
+- **Current value:** ≈ $101.32
 
 ---
 
