@@ -85,6 +85,27 @@ function normalizeEmailHtml(html) {
   return html;
 }
 
+/**
+ * Some email clients (notably Gmail mobile) strip or ignore <style> blocks.
+ * We inline key typography on headings to ensure consistent rendering.
+ */
+function applyInlineEmailStyles(html) {
+  const h1Style = 'style="font-size:14px !important; line-height:1.16 !important; margin:0 0 8px 0 !important; font-weight:600 !important; letter-spacing:-0.01em !important; font-family:Georgia, serif !important;"';
+  const h2Style = 'style="font-size:16px !important; line-height:1.25 !important; margin:20px 0 8px 0 !important; font-weight:600 !important; font-family:Georgia, serif !important;"';
+  const h3Style = 'style="font-size:14px !important; line-height:1.25 !important; margin:16px 0 6px 0 !important; font-weight:600 !important; font-family:Georgia, serif !important;"';
+
+  html = html.replace(/<h1(\s|>)/gi, `<h1 ${h1Style}$1`);
+  html = html.replace(/<h2(\s|>)/gi, `<h2 ${h2Style}$1`);
+  html = html.replace(/<h3(\s|>)/gi, `<h3 ${h3Style}$1`);
+
+  // Prevent nested spans/emphasis from inflating headings by wrapping h1 contents
+  html = html.replace(/<h1([^>]*)>/gi, (m) => m.replace(/>$/, '><span style="font-size:inherit !important; line-height:inherit !important;">'));
+  html = html.replace(/<\/h1>/gi, '</span></h1>');
+
+  return html;
+}
+
+
 async function postmarkSend(toEmail, subject, htmlBody) {
   const res = await fetch("https://api.postmarkapp.com/email", {
     method: "POST",
@@ -139,7 +160,7 @@ async function main() {
   const subject = subjectFor(postType, spelled);
 
   const mainHtmlRaw = extractMainHtml(fullHtml);
-  const mainHtml = normalizeEmailHtml(mainHtmlRaw);
+  const mainHtml = applyInlineEmailStyles(normalizeEmailHtml(mainHtmlRaw));
 
   // Email-safe typography overrides (tighten H1 + spacing)
   const emailCss = `
