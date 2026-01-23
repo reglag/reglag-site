@@ -1,0 +1,1 @@
+The Research Desk is maintained internally as a belief-tracking system. Objects record current beliefs, falsification conditions, and internal commits. Proof-of-Work reviews document evidence checked during defined review windows. Beliefs move only when forced by evidence.
