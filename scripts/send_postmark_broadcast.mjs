@@ -147,8 +147,8 @@ async function main() {
       /* Basic reset */
       body { margin: 0; padding: 0; }
       h1 {
-      font-size: 15px !important;
-      line-height: 1.18 !important;
+      font-size: 14px !important;
+      line-height: 1.16 !important;
       margin: 0 0 8px 0 !important;
       font-weight: 600 !important;
       letter-spacing: -0.01em !important;
@@ -171,7 +171,7 @@ async function main() {
 
   const emailHtml = `
     ${emailCss}
-    <div style="max-width:820px;margin:0 auto;padding:16px 18px;font-family:Georgia,serif;font-size:16px;line-height:1.6;color:#111;">
+    <div style="max-width:600px;margin:0 auto;padding:16px 18px;font-family:Georgia,serif;font-size:16px;line-height:1.6;color:#111;">
       ${mainHtml}
     </div>
   `;
