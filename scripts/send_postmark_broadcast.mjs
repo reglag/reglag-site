@@ -86,21 +86,23 @@ function normalizeEmailHtml(html) {
 }
 
 /**
- * Some email clients (notably Gmail mobile) strip or ignore <style> blocks.
- * We inline key typography on headings to ensure consistent rendering.
+ * Some email clients strip or ignore <style> blocks.
+ * Inline key typography on headings to ensure consistent rendering.
  */
 function applyInlineEmailStyles(html) {
   const h1Style = 'style="font-size:16px !important; line-height:1.2 !important; margin:0 0 10px 0 !important; font-weight:600 !important; letter-spacing:-0.005em !important; font-family:Georgia, serif !important;"';
   const h2Style = 'style="font-size:16px !important; line-height:1.25 !important; margin:20px 0 8px 0 !important; font-weight:600 !important; font-family:Georgia, serif !important;"';
   const h3Style = 'style="font-size:14px !important; line-height:1.25 !important; margin:16px 0 6px 0 !important; font-weight:600 !important; font-family:Georgia, serif !important;"';
 
-  html = html.replace(/<h1(\s|>)/gi, `<h1 ${h1Style}$1`);
-  html = html.replace(/<h2(\s|>)/gi, `<h2 ${h2Style}$1`);
-  html = html.replace(/<h3(\s|>)/gi, `<h3 ${h3Style}$1`);
+  // Handle bare tags and tags with attributes separately to avoid malformed markup.
+  html = html.replace(/<h1>/gi, `<h1 ${h1Style}>`);
+  html = html.replace(/<h1\s+/gi, `<h1 ${h1Style} `);
 
-  // Prevent nested spans/emphasis from inflating headings by wrapping h1 contents
-  html = html.replace(/<h1([^>]*)>/gi, (m) => m.replace(/>$/, '><span style="font-size:inherit !important; line-height:inherit !important;">'));
-  html = html.replace(/<\/h1>/gi, '</span></h1>');
+  html = html.replace(/<h2>/gi, `<h2 ${h2Style}>`);
+  html = html.replace(/<h2\s+/gi, `<h2 ${h2Style} `);
+
+  html = html.replace(/<h3>/gi, `<h3 ${h3Style}>`);
+  html = html.replace(/<h3\s+/gi, `<h3 ${h3Style} `);
 
   return html;
 }
@@ -177,10 +179,6 @@ async function main() {
     }
 
     h1 * {
-      font-size: inherit !important;
-      line-height: inherit !important;
-    }
-h1 * {
       font-size: inherit !important;
       line-height: inherit !important;
     }
