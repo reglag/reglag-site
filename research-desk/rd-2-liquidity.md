@@ -3,30 +3,38 @@
 ## Core belief
 Liquidity stress in the current regime is primarily a **throughput and absorption problem**, not an aggregate scarcity problem.
 
-U.S. dollar liquidity moves rapidly out of deposits and into market instruments, but absorption is constrained by **dealer balance sheets, financing persistence, and coordination speed**. Stress therefore forms **after clearing**, in inventory and financing layers, while prices and volatility can remain calm.
+Dollar liquidity moves rapidly out of deposits and into market instruments, but absorption is constrained by **dealer balance sheets, financing persistence, and coordination speed**. Stress therefore forms **after clearing**, in inventory and financing layers, while prices and volatility can remain calm.
 
 The Federal Reserve functions as a **contingent absorber**, not a routine sink. Stablecoins and faster settlement rails amplify velocity and coordination but **do not create new absorption capacity**. System stability depends on whether private balance sheets can absorb flow without prolonged reliance on official backstops.
 
 ---
 
 ## Current status
-Stable, under periodic reassessment.
+**Stable; reaffirmed through ongoing review.**
+
+---
 
 ## Confidence level
-High. Multiple episodes show orderly clearing alongside accumulating post-clearing balance-sheet strain, reinforcing the absorption-constraint framing.
+**High, with conditional risk.**
+
+Confidence is supported by repeated episodes in which auctions clear cleanly while **persistent post-clearing balance-sheet strain** accumulates in dealer inventories and financing behavior. The belief has survived multiple issuance cycles and periods of elevated liquidity reallocation without requiring revision.
+
+Risk to confidence is asymmetric: deterioration would likely appear through **duration and persistence effects** rather than abrupt price dislocation.
+
+---
 
 ## What would change this view
 This belief would be revised if:
 
 - Private absorption capacity scales endogenously with issuance and settlement speed.
-- Large flows clear repeatedly without inventory persistence, financing strain, or official support.
+- Large flows clear repeatedly **without** inventory persistence, financing strain, or official support.
 - Stablecoins structurally become net absorbers rather than pass-through vehicles.
 - Official facilities disengage cleanly after stress without residual private-market strain.
 
 ---
 
 ## Control surface
-RD-2 belief can change only if one or more of the following move materially:
+RD-2 belief can change only if one or more of the following move:
 
 - **Absorption location** (banks, MMFs, dealers, official facilities)
 - **Intermediation capacity** (dealer balance sheets, leverage, internal limits)
@@ -36,70 +44,92 @@ RD-2 belief can change only if one or more of the following move materially:
 
 ---
 
+## Scope boundary
+RD-2 does not opine on price levels, volatility forecasts, or optimal policy responses. It tracks **where absorption and intermediation constraints form and persist**, not how markets should respond.
+
+---
+
 ## Sub-tracks
 
 ### RD-2A — System-Level Absorption Capacity
 **Foundational public work:**  
 Stablecoins as narrow, reserve-backed instruments; deposit mobility and funding substitution; system-level absorption and throughput constraints.
 
-**Core contribution:**  
-Deposits are mobile liabilities, not inert funding. Stablecoins accelerate coordination but terminate in the same short-end absorbers. Stress emerges when speed exceeds balance-sheet capacity.
+**Role:**  
+Explains how liquidity velocity and coordination interact with finite absorbers once funds leave deposits.
 
 ---
 
 ### RD-2B — Treasury Market Absorption & Intermediation Capacity
 **Foundational public work:**  
-Treasury Market Absorption — Part I & II.
+Treasury Market Absorption — Parts I & II.
 
-**Core contribution:**  
-Auctions clear risk but do not distribute inventory. Dealers are residual absorbers by position, not mandate. Stress forms post-clearing via inventory persistence and financing behavior.
-
----
-
-## Updates
-
-### January 18, 2026
-**Assessment**  
-The liquidity trilogy (stablecoins, deposits, system absorption) established a consistent pattern across instruments: liquidity moves quickly, but absorption remains balance-sheet-bound.
-
-**Interpretation**  
-This reinforced the view that stress formation is temporal and post-clearing. Deposits and stablecoins differ in form, not in their ultimate termination point within the system.
-
-**Belief change**  
-None.
+**Role:**  
+Locates constraint formation **after auction clearing**, in dealer inventories and financing behavior rather than in price discovery.
 
 ---
 
-### January 19, 2026
-**Assessment**  
-Treasury market deep dives clarified the distinction between auction clearing and inventory absorption, with dealers functioning as residual absorbers.
+## Tripwires
+Active watcher exists for RD-2 only.
 
-**Interpretation**  
-Clearing success does not equate to system health. Balance-sheet persistence and financing behavior are the binding constraint channels, not price discovery.
+Tripwires include:
+- Directional or normalized use of official facilities.
+- Persistent auction anomalies across cycles.
+- Dealer inventory persisting beyond expected turnover windows.
+- Repo financing extending materially in maturity or duration.
+- Structural changes in settlement speed or coordination mechanisms.
 
-**Belief change**  
-None.
-
----
-
-### January 24, 2026
-**Assessment**  
-Treasury Market Absorption — Part I sharpened the conceptual separation between **clearing** and **absorption**, showing that prices can remain orderly while constraints accumulate off-price.
-
-**Interpretation**  
-Constraint detection should prioritize **duration and persistence metrics** (inventory carry time, financing rolls) over auction optics or volatility. Calm prices are insufficient evidence of capacity.
-
-**Belief change**  
-None.
+Tripwire firing ⇒ review.  
+Tripwire ≠ belief change.
 
 ---
 
-### January 25, 2026
-**Assessment**  
-Treasury Market Absorption — Part II reinforced dealers as **residual absorbers by structure**, with redistribution governed by balance-sheet limits rather than auction demand.
+## Internal RD updates (chronological)
 
-**Interpretation**  
-The operative signals remain post-clearing: inventory duration, financing terms, and quarter-end sensitivity. Normal auction outcomes do not negate binding capacity constraints.
+### January 18, 2026 — RD-2A baseline established
+**Assessment:**  
+Liquidity trilogy evaluating stablecoins, deposit mobility, and system-level absorption.
 
-**Belief change**  
-None.
+**Interpretation:**  
+Liquidity should be analyzed as throughput and absorption capacity rather than aggregates. Deposits are managed liabilities; stablecoins accelerate coordination but do not absorb.
+
+**Belief change:**  
+None (baseline established).
+
+---
+
+### January 19, 2026 — RD-2B baseline established
+**Assessment:**  
+Treasury Market Absorption deep-dive pair.
+
+**Interpretation:**  
+Auctions are clearing mechanisms; stress accumulates post-clearing in dealer inventories and financing. Balance-sheet capacity binds before price signals.
+
+**Belief change:**  
+None (baseline established).
+
+---
+
+### January 24, 2026 — RD-2B reinforcement (clearing vs absorption)
+**Assessment:**  
+Treasury Market Absorption — Part I.
+
+**Interpretation:**  
+Further sharpened the distinction between auction clearing and risk absorption, emphasizing temporal persistence as the relevant stress signal.
+
+**Belief change:**  
+None (belief reaffirmed).
+
+---
+
+### January 25, 2026 — RD-2B reinforcement (dealer balance sheets)
+**Assessment:**  
+Treasury Market Absorption — Part II.
+
+**Interpretation:**  
+Reinforced dealers as residual absorbers by structure, with balance-sheet capacity governing redistribution speed independent of auction demand.
+
+**Belief change:**  
+None (belief reaffirmed).
+
+---
