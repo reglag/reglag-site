@@ -102,3 +102,37 @@ Sustained heavy issuance absorbed without inventory persistence or financing str
 Bridges to RD-3 when capacity constraints dominate.
 
 ---
+
+### January 24, 2026 — RD-2B reinforcement (clearing vs absorption)
+**Trigger:** Treasury Market Absorption — Part I (Jan 24, 2026)
+
+**What changed:**  
+No belief change. This deep dive sharpened the conceptual separation between **auction clearing** and **risk absorption**, emphasizing that price discovery can remain orderly while capacity constraints accumulate temporally.
+
+**What matters now:**  
+Constraint detection should prioritize **duration and persistence metrics** (inventory carry time, financing rolls) over auction optics or volatility. Calm prices are insufficient evidence of system health.
+
+**What would falsify this:**  
+Evidence that heavy issuance clears repeatedly **without** inventory persistence or financing strain would weaken the temporal-constraint framing.
+
+**Classification:**  
+Reinforcement of RD-2B baseline.
+
+---
+
+### January 25, 2026 — RD-2B reinforcement (dealer balance sheets)
+**Trigger:** Treasury Market Absorption — Part II (Jan 25, 2026)
+
+**What changed:**  
+No belief change. This deep dive reinforced dealers as **residual absorbers by structure**, with balance-sheet capacity, leverage optics, and internal limits governing redistribution speed rather than auction demand.
+
+**What matters now:**  
+The operative signals remain **post-clearing balance-sheet behavior**: how long inventory sits, how it is financed, and sensitivity around quarter-ends. Normal auction outcomes do not negate binding capacity constraints.
+
+**What would falsify this:**  
+Sustained issuance absorbed without dealer inventory persistence or financing extension, or a durable shift of residual absorption away from dealers without price dislocation or official support.
+
+**Classification:**  
+Reinforcement of RD-2B baseline.
+
+---
