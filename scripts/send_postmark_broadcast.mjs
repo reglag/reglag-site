@@ -90,9 +90,9 @@ function normalizeEmailHtml(html) {
  * Inline key typography on headings to ensure consistent rendering.
  */
 function applyInlineEmailStyles(html) {
-  const h1Style = 'style="font-size:16px !important; line-height:1.2 !important; margin:0 0 10px 0 !important; font-weight:600 !important; letter-spacing:-0.005em !important; font-family:Georgia, serif !important;"';
-  const h2Style = 'style="font-size:16px !important; line-height:1.25 !important; margin:20px 0 8px 0 !important; font-weight:600 !important; font-family:Georgia, serif !important;"';
-  const h3Style = 'style="font-size:14px !important; line-height:1.25 !important; margin:16px 0 6px 0 !important; font-weight:600 !important; font-family:Georgia, serif !important;"';
+  const h1Style = 'style="font-size:20px !important; line-height:1.22 !important; margin:0 0 10px 0 !important; font-weight:600 !important; letter-spacing:-0.005em !important; font-family:Georgia, serif !important;"';
+  const h2Style = 'style="font-size:14px !important; line-height:1.25 !important; margin:18px 0 8px 0 !important; font-weight:600 !important; font-family:Georgia, serif !important;"';
+  const h3Style = 'style="font-size:13px !important; line-height:1.25 !important; margin:14px 0 6px 0 !important; font-weight:600 !important; font-family:Georgia, serif !important;"';
 
   // Handle bare tags and tags with attributes separately to avoid malformed markup.
   html = html.replace(/<h1>/gi, `<h1 ${h1Style}>`);
@@ -170,8 +170,8 @@ async function main() {
       /* Basic reset */
       body { margin: 0; padding: 0; }
       h1 {
-      font-size: 16px !important;
-      line-height: 1.2 !important;
+      font-size: 20px !important;
+      line-height: 1.22 !important;
       margin: 0 0 10px 0 !important;
       font-weight: 600 !important;
       letter-spacing: -0.005em !important;
@@ -182,8 +182,8 @@ async function main() {
       font-size: inherit !important;
       line-height: inherit !important;
     }
-      h2 { font-size: 16px; line-height: 1.25; margin: 20px 0 8px 0; }
-      h3 { font-size: 14px; line-height: 1.25; margin: 16px 0 6px 0; }
+h2 { font-size: 14px !important; line-height: 1.25 !important; margin: 18px 0 8px 0 !important; font-weight: 600 !important; }
+      h3 { font-size: 13px !important; line-height: 1.25 !important; margin: 14px 0 6px 0 !important; font-weight: 600 !important; }
       p { margin: 0 0 10px 0; }
       ul, ol { margin: 0 0 10px 18px; padding: 0; }
       li { margin: 0 0 6px 0; }
